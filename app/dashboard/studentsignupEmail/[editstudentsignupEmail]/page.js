@@ -26,7 +26,7 @@ const Page = ({params}) => {
 
     const getUserDetail = async () => {
         try {
-            const res = await fetch(`http://localhost:3000/api/studentSignupEmail/${params.editstudentsignupEmail}`);
+            const res = await fetch(`/api/studentSignupEmail/${params.editstudentsignupEmail}`);
             const userData = await res.json();
 
             if (userData.success) {
@@ -56,7 +56,7 @@ const Page = ({params}) => {
 
     const updateUser = async (userData) => {
         try {
-            const res = await fetch(`http://localhost:3000/api/studentSignupEmail/${params.editstudentsignupEmail}`, {
+            const res = await fetch(`/api/studentSignupEmail/${params.editstudentsignupEmail}`, {
                 method: "PUT",
                 body: JSON.stringify(userData),
                 headers: {

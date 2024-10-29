@@ -31,7 +31,7 @@ export default function Page(props) {
 
     const getDepartmentsDetail = async () => {
         try {
-            const res = await fetch(`http://localhost:3000/api/departments/${props.params.editdepartment}`);
+            const res = await fetch(`/api/departments/${props.params.editdepartment}`);
             const departmentsData = await res.json();
             if (departmentsData.success) {
                 // console.log(departmentsData.result)
@@ -54,7 +54,7 @@ export default function Page(props) {
 
     const updateDepartment = async () => {
         try {
-            let result = await fetch(`http://localhost:3000/api/departments/${props.params.editdepartment}`, {
+            let result = await fetch(`/api/departments/${props.params.editdepartment}`, {
                 method: "PUT",
                 body: JSON.stringify({ name, description, link, image }),
                 headers: {

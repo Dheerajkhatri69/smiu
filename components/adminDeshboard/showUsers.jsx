@@ -55,7 +55,7 @@ export const ShowUsers = () => {
         if (!confirmDelete) return; // Exit if no department is selected for deletion
 
         try {
-            let result = await fetch(`http://localhost:3000/api/users/${confirmDelete.id}`, {
+            let result = await fetch(`/api/users/${confirmDelete.id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

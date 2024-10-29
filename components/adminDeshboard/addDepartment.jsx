@@ -25,7 +25,7 @@ export function AddDepartment() {
 
   const addDepartment = async () => {
     try {
-      let result = await fetch("http://localhost:3000/api/departments", {
+      let result = await fetch("/api/departments", {
         method: "POST",
         body: JSON.stringify({ name, description, link, image }),
         headers: {

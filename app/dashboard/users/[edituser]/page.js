@@ -42,7 +42,7 @@ const Page = (props) => {
 
     const getuserDetail = async () => {
         try {
-            const res = await fetch(`http://localhost:3000/api/users/${props.params.edituser}`);
+            const res = await fetch(`/api/users/${props.params.edituser}`);
             const userData = await res.json();
 
             if (userData.success) {
@@ -87,7 +87,7 @@ const Page = (props) => {
 
     const updateUser = async (userData) => {
         try {
-            let result = await fetch(`http://localhost:3000/api/users/${props.params.edituser}`, {
+            let result = await fetch(`/api/users/${props.params.edituser}`, {
                 method: "PUT",
                 body: JSON.stringify(userData),
                 headers: {

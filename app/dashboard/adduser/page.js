@@ -53,7 +53,7 @@ const Page = () => {
 
     const addUser = async (formData) => {
         try {
-            const userExistResponse = await fetch("http://localhost:3000/api/userExiste", {
+            const userExistResponse = await fetch("/api/userExiste", {
                 method: "POST",
                 body: JSON.stringify({ email: formData.email, cnic: formData.cnic, id: formData.id }),
                 headers: {
@@ -92,7 +92,7 @@ const Page = () => {
             }
 
             // If no user exists, proceed with adding the user
-            const result = await fetch("http://localhost:3000/api/users", {
+            const result = await fetch("/api/users", {
                 method: "POST",
                 body: JSON.stringify(formData),
                 headers: {

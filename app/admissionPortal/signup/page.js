@@ -32,7 +32,7 @@ const Page = () => {
 
     const addstudentSignupEmail = async (formData) => {
         try {
-            const studentSignupExistResponse = await fetch("http://localhost:3000/api/studentSignupEmail/studentSignupEmailExiste", {
+            const studentSignupExistResponse = await fetch("/api/studentSignupEmail/studentSignupEmailExiste", {
                 method: "POST",
                 body: JSON.stringify({ cnic: formData.cnic, email: formData.email }),
                 headers: {
@@ -74,7 +74,7 @@ const Page = () => {
             }
 
             // If no user exists, proceed with adding the user
-            const result = await fetch("http://localhost:3000/api/studentSignupEmail", {
+            const result = await fetch("/api/studentSignupEmail", {
                 method: "POST",
                 body: JSON.stringify(formData),
                 headers: {

@@ -55,7 +55,7 @@ export const ShowStudentSignupEmail = () => {
         if (!confirmDelete) return; // Exit if no department is selected for deletion
 
         try {
-            let result = await fetch(`http://localhost:3000/api/studentSignupEmail/${confirmDelete.id}`, {
+            let result = await fetch(`/api/studentSignupEmail/${confirmDelete.id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
