@@ -9,12 +9,27 @@ module.exports = {
 	theme: {
     	extend: {
     		animation: {
-    			scroll: 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite'
+    			scroll: 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite',
+    			rainbow: 'rainbow var(--speed, 2s) infinite linear',
+    			gradient: 'gradient 8s linear infinite'
     		},
     		keyframes: {
     			scroll: {
     				to: {
     					transform: 'translate(calc(-50% - 0.5rem))'
+    				}
+    			},
+    			rainbow: {
+    				'0%': {
+    					'background-position': '0%'
+    				},
+    				'100%': {
+    					'background-position': '200%'
+    				}
+    			},
+    			gradient: {
+    				to: {
+    					backgroundPosition: 'var(--bg-size) 0'
     				}
     			}
     		},
@@ -68,13 +83,21 @@ module.exports = {
     				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
     				border: 'hsl(var(--sidebar-border))',
     				ring: 'hsl(var(--sidebar-ring))'
-    			}
+    			},
+    			'color-1': 'hsl(var(--color-1))',
+    			'color-2': 'hsl(var(--color-2))',
+    			'color-3': 'hsl(var(--color-3))',
+    			'color-4': 'hsl(var(--color-4))',
+    			'color-5': 'hsl(var(--color-5))'
     		},
     		borderRadius: {
     			lg: 'var(--radius)',
     			md: 'calc(var(--radius) - 2px)',
     			sm: 'calc(var(--radius) - 4px)'
-    		}
+    		},
+			fontFamily:{
+				dheerajTitle :["DynaPuff", "cursive"]
+			}
     	}
     },
 	plugins: [require("tailwindcss-animate")],
