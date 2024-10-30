@@ -113,7 +113,7 @@ const Page = () => {
                     </div>
                     {/* eslint-disable-next-line react/no-unescaped-entities */}
                     <p className="text-gray-800 text-sm mt-6 text-center">
-                        Don&apos;t have an account?{" "}
+                        Do not have an account?
                         <Link href="/admissionPortal/signup" className="text-blue-600 font-semibold hover:underline ml-1">
                             Sign up here
                         </Link>

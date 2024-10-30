@@ -11,7 +11,7 @@ export function AnimatedPinDemo() {
                 >
                     <div className="text-base !m-0 !p-0 font-normal">
                         <span className="text-slate-500 ">
-                            Pakistan's Higher Education Commission, is one of South Asia's oldest institutions, founded in 1885 as a school, later becoming a college in 1943, and a university in 2012.
+                            Pakistan Higher Education Commission, is one of South Asia oldest institutions, founded in 1885 as a school, later becoming a college in 1943, and a university in 2012.
                         </span>
                     </div><div
                         className="flex flex-1 w-full rounded-lg mt-4 bg-gradient-to-br from-violet-500 via-purple-500 to-blue-500"

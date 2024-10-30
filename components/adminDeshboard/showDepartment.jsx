@@ -163,7 +163,7 @@ export const ShowDepartment = () => {
                             <Skeleton className="h-12 w-full rounded bg-primary mt-2" />
                         </Skeleton>
                     </div>
-                    
+
                 </div>
 
                 <Table className="min-w-full table-auto border-collapse shadow-lg">
@@ -225,8 +225,7 @@ export const ShowDepartment = () => {
             <div className='container mx-auto grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 p-2'>
                 {departments.length > 0 ? (
                     departments.map((department) => (
-
-                        <Link href={`/dashboard/departments/${department._id}`}>
+                        <Link key={department._id} href={`/dashboard/departments/${department._id}`}>
                             <DepCard image={department.image} name={department.name} description={department.description} />
                         </Link>
                     ))
@@ -258,18 +257,16 @@ export const ShowDepartment = () => {
                                         <Image
                                             src={department.image}
                                             alt="Uploaded Image"
-                                            layout="fill" // This makes the image fill the container
-                                            objectFit="cover" // This ensures the image maintains aspect ratio
+                                            layout="fill"
+                                            objectFit="cover"
                                             className="rounded-lg"
                                         />
                                     </div>
                                 </TableCell>
                                 <TableCell className="p-4 text-gray-800 dark:text-gray-100">{department.name}</TableCell>
-                                {/* TruncatedText for description */}
                                 <TableCell className="p-4 text-gray-800 dark:text-gray-100">
                                     <TruncatedText text={department.description} wordLimit={10} />
                                 </TableCell>
-                                {/* TruncatedText for link */}
                                 <TableCell className="p-4 text-gray-800 dark:text-gray-100">
                                     <TruncatedText text={department.link} wordLimit={10} />
                                 </TableCell>
@@ -295,6 +292,7 @@ export const ShowDepartment = () => {
                             </TableCell>
                         </TableRow>
                     )}
+
                 </TableBody>
             </Table>
 

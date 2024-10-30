@@ -92,8 +92,8 @@ const Page = () => {
                 message: "Invalid Pakistani mobile number",
             },
         },
-        fathersName: { required: "Father's Name is required" },
-        fathersOccupation: { required: "Father's Occupation is required" },
+        fathersName: { required: "Father Name is required" },
+        fathersOccupation: { required: "Father Occupation is required" },
         nationality: { required: "Nationality is required" },
         dateOfBirth: { required: "Date of Birth is required" },
         gender: { required: "Gender is required" },
@@ -114,7 +114,7 @@ const Page = () => {
             setMessageHead(
                 <>
                     <span className="bg-yellow-200 p-2">
-                        Alart!
+                        Alart
                     </span>
                 </>
             )
@@ -130,7 +130,7 @@ const Page = () => {
         setMessageHead(
             <>
                 <span className="bg-green-400 p-2">
-                    Success!
+                    Success
                 </span>
             </>
         )
@@ -238,7 +238,7 @@ const Page = () => {
                                             rules={validationRules.fathersName}
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Father's Name</FormLabel>
+                                                    <FormLabel>Father Name</FormLabel>
                                                     <FormControl>
                                                         <Input placeholder="Father's Name" {...field} />
                                                     </FormControl>
@@ -252,7 +252,7 @@ const Page = () => {
                                             rules={validationRules.fathersOccupation}
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Father's Occupation</FormLabel>
+                                                    <FormLabel>Father Occupation</FormLabel>
                                                     <FormControl>
                                                         <Input placeholder="Father's Occupation" {...field} />
                                                     </FormControl>
