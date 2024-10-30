@@ -148,8 +148,8 @@ const FlickeringGrid = ({
       ref={canvasRef}
       className={`size-full pointer-events-none ${className}`}
       style={{
-        width: width || "100%",
-        height: height || "100%",
+        width: "110%",
+        height: "100%",
       }}
       width={width}
       height={height} />)

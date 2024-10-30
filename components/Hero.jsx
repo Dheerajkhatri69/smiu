@@ -23,7 +23,7 @@ export function FlickeringGridDemo() {
         // color="#B9E5E8"
         color="#ffffff"
         maxOpacity={1}
-        flickerChance={0.1}
+        flickerChance={0.5}
       />
       <div className="z-10 flex items-center justify-center">
         <AnimatedGradientText>
@@ -45,7 +45,7 @@ export function FlickeringGridDemo() {
         className="font-display mx-4 text-center text-4xl font-dheerajTitle font-bold tracking-[-0.02em] text-black drop-shadow-sm md:text-7xl md:leading-[5rem]"
       />
       <SparklesText
-        className={"font-dheerajTitle text-center text-sm sm:text-xl max-w-[600px] px-2"}
+        className={"text-center text-sm sm:text-xl max-w-[600px] px-2"}
         text="Sindh Madressatul Islam University (SMIU) is a chartered University duly recognized by the Higher Education Commission of Pakistan. It is one of the oldest institutions in South Asia, which started as a school in 1885, became a college in 1943 and a university in February 2012." />
 
       <RainbowButton className={"my-4"}>Get Unlimited Access</RainbowButton>
