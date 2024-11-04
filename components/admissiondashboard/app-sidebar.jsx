@@ -74,7 +74,7 @@ export function AppSidebar({
                     },
                     {
                       title: "4. Academic Data",
-                      url: "#",
+                      url: "/admissiondashboard/academicData",
                     },
                     {
                       title: "5. Print & Preview",

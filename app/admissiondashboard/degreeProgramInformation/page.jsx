@@ -26,8 +26,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+
 import { useState } from "react";
 
 const Page = () => {
@@ -100,50 +103,32 @@ const Page = () => {
     // Initialize the form with react-hook-form with validation
     const form = useForm({
         defaultValues: {
-            guardianName: "",
-            occupation: "",
-            jobNature: "",
-            relationshipWithApllicant: "",
-            monthlyIncome: "",
-            mobile: "",
-            organization: "",
-            designation: "",
-            address: "",
-            emergencyName: "",
-            eRelationshipWithApllicant: "",
-            eMobile: "",
-            eCompleteAddress: "",
+            choice01: "",
+            choice02: "",
+            choice03: "",
+            choice04: "",
+            choice05: "",
+            choice06: "",
+            choice07: "",
+            choice08: "",
+            finance_scheme: false,
+            transport_facility: false,
+            immediate_family_to_attend_university: "no"
         },
         mode: "onBlur", // Validate on blur
     });
 
     // Validation rules for all fields to be required
     const validationRules = {
-        guardianName: { required: "Guardian Name is required" },
-        occupation: { required: "Occupation is required" },
-        jobNature: { required: "Job Nature is required" },
-        relationshipWithApllicant: { required: "Relationship With Apllicant is required" },
-        monthlyIncome: { required: "Monthly Income is required" },
-        mobile: {
-            required: "Mobile number is required",
-            pattern: {
-                value: /^(?:\+92|0)?[3][0-9]{2}-?[0-9]{7}$/, // Pakistani mobile number regex
-                message: "Invalid Pakistani mobile number",
-            },
-        },
-        organization: { required: "Organization is required" },
-        designation: { required: "Designation is required" },
-        address: { required: "Address is required" },
-        emergencyName: { required: "Emergency Name is required" },
-        eRelationshipWithApllicant: { required: "Relationship With Apllicant is required" },
-        eMobile: {
-            required: "Mobile number is required",
-            pattern: {
-                value: /^(?:\+92|0)?[3][0-9]{2}-?[0-9]{7}$/, // Pakistani mobile number regex
-                message: "Invalid Pakistani mobile number",
-            },
-        },
-        eCompleteAddress: { required: "Complete Address is required" },
+        degreeProgram: { required: "Degree Program is required" },
+        choice01: { required: "1st Choice is required" },
+        choice02: { required: "2nd Choice is required" },
+        choice03: { required: "3rd Choice is required" },
+        choice04: { required: "4th Choice is required" },
+        choice05: { required: "5th Choice is required" },
+        choice06: { required: "6th Choice is required" },
+        choice07: { required: "7th Choice is required" },
+        choice08: { required: "8th Choice is required" },
     };
     const [selectedDegree, setSelectedDegree] = useState("");
 
@@ -191,8 +176,8 @@ const Page = () => {
 
                                     <FormField
                                         control={form.control}
-                                        name="degreeProgram"
                                         rules={validationRules.degreeProgram}
+                                        name="degreeProgram"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Select Degree Program</FormLabel>
@@ -223,6 +208,7 @@ const Page = () => {
                                         <FormField
                                             control={form.control}
                                             name="choice01"
+                                            rules={validationRules.choice01}
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>1st Choice</FormLabel>
@@ -249,67 +235,11 @@ const Page = () => {
                                         />
                                         <FormField
                                             control={form.control}
-                                            name="choice01"
+                                            name="choice02"
+                                            rules={validationRules.choice02}
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>1st Choice</FormLabel>
-                                                    <FormControl>
-                                                        <Select
-                                                            onValueChange={(value) => field.onChange(value)}
-                                                            value={field.value} // Ensure correct value from form state
-                                                        >
-                                                            <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
-                                                                <SelectValue placeholder="--Select Program--" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {getProgramOptions().map((program) => (
-                                                                    <SelectItem key={program.value} value={program.value}>
-                                                                        {program.label}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </span>
-                                    <span className="lg:flex  items-end justify-between block space-y-8">
-
-                                        <FormField
-                                            control={form.control}
-                                            name="choice01"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>1st Choice</FormLabel>
-                                                    <FormControl>
-                                                        <Select
-                                                            onValueChange={(value) => field.onChange(value)}
-                                                            value={field.value} // Ensure correct value from form state
-                                                        >
-                                                            <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
-                                                                <SelectValue placeholder="--Select Program--" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {getProgramOptions().map((program) => (
-                                                                    <SelectItem key={program.value} value={program.value}>
-                                                                        {program.label}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="choice01"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>1st Choice</FormLabel>
+                                                    <FormLabel>2nd Choice</FormLabel>
                                                     <FormControl>
                                                         <Select
                                                             onValueChange={(value) => field.onChange(value)}
@@ -336,10 +266,11 @@ const Page = () => {
 
                                         <FormField
                                             control={form.control}
-                                            name="choice01"
+                                            rules={validationRules.choice03}
+                                            name="choice03"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>1st Choice</FormLabel>
+                                                    <FormLabel>3rd Choice</FormLabel>
                                                     <FormControl>
                                                         <Select
                                                             onValueChange={(value) => field.onChange(value)}
@@ -363,10 +294,11 @@ const Page = () => {
                                         />
                                         <FormField
                                             control={form.control}
-                                            name="choice01"
+                                            name="choice04"
+                                            rules={validationRules.choice04}
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>1st Choice</FormLabel>
+                                                    <FormLabel>4th Choice</FormLabel>
                                                     <FormControl>
                                                         <Select
                                                             onValueChange={(value) => field.onChange(value)}
@@ -393,10 +325,10 @@ const Page = () => {
 
                                         <FormField
                                             control={form.control}
-                                            name="choice01"
+                                            name="choice05"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>1st Choice</FormLabel>
+                                                    <FormLabel>5th Choice</FormLabel>
                                                     <FormControl>
                                                         <Select
                                                             onValueChange={(value) => field.onChange(value)}
@@ -420,10 +352,67 @@ const Page = () => {
                                         />
                                         <FormField
                                             control={form.control}
-                                            name="choice01"
+                                            name="choice06"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>1st Choice</FormLabel>
+                                                    <FormLabel>6th Choice</FormLabel>
+                                                    <FormControl>
+                                                        <Select
+                                                            onValueChange={(value) => field.onChange(value)}
+                                                            value={field.value} // Ensure correct value from form state
+                                                        >
+                                                            <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                <SelectValue placeholder="--Select Program--" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {getProgramOptions().map((program) => (
+                                                                    <SelectItem key={program.value} value={program.value}>
+                                                                        {program.label}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </span>
+                                    <span className="lg:flex  items-end justify-between block space-y-8">
+
+                                        <FormField
+                                            control={form.control}
+                                            name="choice07"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>7th Choice</FormLabel>
+                                                    <FormControl>
+                                                        <Select
+                                                            onValueChange={(value) => field.onChange(value)}
+                                                            value={field.value} // Ensure correct value from form state
+                                                        >
+                                                            <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                <SelectValue placeholder="--Select Program--" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {getProgramOptions().map((program) => (
+                                                                    <SelectItem key={program.value} value={program.value}>
+                                                                        {program.label}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="choice08"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>8th Choice</FormLabel>
                                                     <FormControl>
                                                         <Select
                                                             onValueChange={(value) => field.onChange(value)}
@@ -451,21 +440,94 @@ const Page = () => {
 
                             </span>
                             <span className="flex flex-col gap-8">
-
                                 <FormField
                                     control={form.control}
-                                    name="eCompleteAddress"
-                                    rules={validationRules.eCompleteAddress}
+                                    name="finance_scheme"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Complete Address</FormLabel>
+                                            <FormLabel>Check the box if you are interested in Finance Scheme</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Complete Address" {...field} />
+                                                <div className="flex items-center space-x-2">
+                                                    <Checkbox
+                                                        id="finance_scheme"
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                        className="bg-white"
+                                                    />
+                                                    <label
+                                                        htmlFor="finance_scheme"
+                                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                    >
+                                                        Slep Finance Scheme
+                                                    </label>
+                                                </div>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
+
+                                <FormField
+                                    control={form.control}
+                                    name="transport_facility"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Check the box if you are interested in Transport Facility</FormLabel>
+                                            <FormControl>
+                                                <div className="flex items-center space-x-2">
+                                                    <Checkbox
+                                                        id="transport_facility"
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                        className="bg-white"
+                                                    />
+                                                    <label
+                                                        htmlFor="transport_facility"
+                                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                    >
+                                                        Transport Facility
+                                                    </label>
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="immediate_family_to_attend_university"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Are you the first person in your immediate family to attend university?</FormLabel>
+                                            <FormControl>
+                                                <RadioGroup
+                                                    value={field.value}
+                                                    onValueChange={field.onChange}
+                                                >
+                                                    <div className="flex items-center space-x-2">
+                                                        <RadioGroupItem
+                                                            value="yes"
+                                                            id="immediate_family_yes"
+                                                            className="bg-white text-black"
+                                                        />
+                                                        <Label htmlFor="immediate_family_yes">YES</Label>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                        <RadioGroupItem
+                                                            value="no"
+                                                            id="immediate_family_no"
+                                                            className="bg-white text-black"
+                                                        />
+                                                        <Label htmlFor="immediate_family_no">NO</Label>
+                                                    </div>
+                                                </RadioGroup>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
                             </span>
 
                             <Button type="submit" className="w-full lg:w-[200px] bg-black text-white font-extrabold hover:bg-gray-600">Submit</Button>
