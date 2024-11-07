@@ -37,10 +37,36 @@ export function AppSidebar({
 }) {
     const { data: session } = useSession(); // Get session data
     const [user, setUser] = React.useState(null); // Initialize with null
+    const [avatar, setAvatar] = React.useState("/avatar.png")
 
+
+    const getAvatar = async (formData) => {
+        try {
+            const personalDataExistResponse = await fetch("/api/admission/personaldataExiste", {
+                method: "POST",
+                body: JSON.stringify({ cnic: formData.cnic, email: formData.email }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const personalDataExistResult = await personalDataExistResponse.json();
+
+            if (personalDataExistResult.exists) {
+                setAvatar(personalDataExistResult.data.image)
+                return; // Stop further processing if any field exists
+            }
+
+
+        } catch (error) {
+            setMessage("Error: Please check your connection.");
+        }
+    }
     React.useEffect(() => {
         if (session?.user) {
             setUser(session.user); // Update user state when session is available
+            getAvatar(session.user)
+
         }
     }, [session]); // Use effect will run when session changes
     // console.log(user);
@@ -48,11 +74,12 @@ export function AppSidebar({
     const useremail = user ? `${user.email || ""}`: "User";
     const usercnic = user && user.cnic ? user.cnic.slice(-5) : "User CNIC";
 
+
     const data = {
         user: {
             name: useremail,
             email: usercnic, // Safeguard for ID
-            avatar:"/avatar.png",
+            avatar:avatar,
         },
         navMain: [
             {
@@ -78,11 +105,11 @@ export function AppSidebar({
                     },
                     {
                       title: "5. Print & Preview",
-                      url: "#",
+                      url: "/admissiondashboard/printPreview",
                     },
                     {
                       title: "6. Final Step Upload Documents",
-                      url: "#",
+                      url: "/admissiondashboard/finalStepUploadDocuments",
                     },
                   ],
             },
@@ -134,7 +161,7 @@ export function AppSidebar({
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <a href="#">
+                            <a href="/admissiondashboard">
                                 <div>
                                     <Logo size={50} />
                                 </div>
