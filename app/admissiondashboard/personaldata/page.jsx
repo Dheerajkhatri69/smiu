@@ -256,7 +256,7 @@ const Page = () => {
             cnic: usercnic,
             email: useremail
         };
-        console.log(fullData)
+        // console.log(fullData)
 
         addPersonalData(fullData)
     };

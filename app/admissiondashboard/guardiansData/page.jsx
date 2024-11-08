@@ -28,14 +28,32 @@ import {
 } from "@/components/ui/select"
 
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 const Page = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [messageHead, setMessageHead] = useState("");
     const [message, setMessage] = useState("");
     const [formData, setFormData] = useState({}); // Store all form data here
     const [selectedDate, setSelectedDate] = useState(null);
+    const [existData, setExistData] = useState({
+        address: "",
+        cnic: "",
+        designation: "",
+        eCompleteAddress: "",
+        eMobile: "",
+        eRelationshipWithApllicant: "",
+        email: "",
+        emergencyName: "",
+        guardianName: "",
+        jobNature: "",
+        mobile: "",
+        monthlyIncome: "",
+        occupation: "",
+        organization: "",
+        relationshipWithApllicant: "",
+        state: false
+    });
 
 
     // Initialize the form with react-hook-form with validation
@@ -89,21 +107,124 @@ const Page = () => {
 
     const { reset, handleSubmit } = form;
 
-    // Handle form submission
-    const onSubmit = (fullData) => {
 
-        console.log("Form data:", fullData); // Log all form data, including image URL
-        setMessageHead(
-            <>
-                <span className="bg-green-400 p-2">
-                    Success!
-                </span>
-            </>
-        )
-        setMessage("Form submitted successfully!");
-        setIsDialogOpen(true);
-        reset(); // Clears all fields to default values
+    const { data: session } = useSession(); // Get session data
+    const [user, setUser] = useState(null); // Initialize with null
+
+    useEffect(() => {
+        if (session?.user) {
+            setUser(session.user); // Update user state when session is available
+            getGuardiansData(session.user);
+        }
+    }, [session]); // Use effect will run when session changes
+
+    const getGuardiansData = async (formData) => {
+        // const addstudentSignupEmail = async (formData) => {
+        try {
+            const guardiansDataExistResponse = await fetch("/api/admission/guardiansData/guardiansDataExiste", {
+                method: "POST",
+                body: JSON.stringify({ cnic: formData.cnic, email: formData.email }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const guardiansDataExistResult = await guardiansDataExistResponse.json();
+
+            if (guardiansDataExistResult.exists) {
+                setExistData({
+                    ...guardiansDataExistResult.data // Update the state with the fetched data
+                });
+
+                return; // Stop further processing if any field exists
+            }
+
+
+        } catch (error) {
+            setMessage("Error: Please check your connection.");
+        }
     };
+
+
+    const useremail = user ? `${user.email || ""}` : "User email";
+    const usercnic = user ? `${user.cnic || ""}` : "User CNIC";
+    // Handle form submission
+
+    const addGuardiansData = async (formdata) => {
+        try {
+            let result = await fetch("/api/admission/guardiansData", {
+                method: "POST",
+                body: JSON.stringify(formdata),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            result = await result.json();
+
+            if (result.success) {
+
+                try {
+                    let response = await fetch(`/api/admission/admissionstate/${formdata.cnic}`, {
+                        method: "PUT",
+                        body: JSON.stringify({
+                            cnic: formdata.cnic,
+                            guardiansData: formdata.state
+                        }),
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+                    response = await response.json();
+                } catch (error) {
+                    console.error("Fetch error:", error);
+                    // Handle the error (e.g., show an error message to the user)
+                }
+
+                setMessageHead(
+                    <span className="bg-green-400 p-2">
+                        Success!
+                    </span>
+                );
+                setMessage("Form submitted successfully!");
+                setIsDialogOpen(true);
+
+                reset(); // Clears all fields to default values
+                // Redirect to /admissiondashboard
+            } else {
+                setMessageHead(
+                    <>
+                        <span className="bg-red-400 p-2">
+                            Error
+                        </span>
+                    </>
+                )
+                setMessage("Error: Unable to add personaldata. Please try again.");
+            }
+        } catch (error) {
+            setMessageHead(
+                <>
+                    <span className="bg-red-400 p-2">
+                        Error
+                    </span>
+                </>
+            )
+            setMessage("Error: Unable to add personaldata. Please check your connection.");
+        }
+        setIsDialogOpen(true);
+    };
+
+
+    const onSubmit = (formData) => {
+        const fullData = {
+            ...formData,
+            cnic: usercnic,
+            email: useremail,
+            state: true
+        };
+        addGuardiansData(fullData)
+        // console.log("Form data:", fullData); // Log all form data, including image URL
+    };
+
     return (
         <div className='relative overflow-hidden'>
             <div className="bg-primary-foreground absolute top-0 left-0 bg-gradient-to-b bg-background/50 blur bottom-0 leading-5 h-[50%] rotate-45 w-full overflow-hidden rounded-3xl"></div>
@@ -129,7 +250,11 @@ const Page = () => {
                                                 <FormItem>
                                                     <FormLabel>Guardian/Sponsor Name</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Guardian/Sponsor Name" {...field} />
+                                                        <Input placeholder="Guardian/Sponsor Name" {...field}
+                                                            value={existData.guardianName || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                            onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                            disabled={existData.state}
+                                                        />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -143,7 +268,11 @@ const Page = () => {
                                                 <FormItem>
                                                     <FormLabel>Occupation</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Occupation" {...field} />
+                                                        <Input placeholder="Occupation" {...field}
+                                                            value={existData.occupation || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                            onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                            disabled={existData.state}
+                                                        />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -161,7 +290,8 @@ const Page = () => {
                                                             onValueChange={(value) => {
                                                                 field.onChange(value); // Update form state
                                                             }}
-                                                            value={field.value} // Ensure correct value from form state
+                                                            value={field.value || existData.jobNature} // Ensure correct value from form state
+                                                            disabled={existData.state}
                                                         >
                                                             <SelectTrigger className="w-[200px] bg-white/50">
                                                                 <SelectValue placeholder="Select Job Nature" />
@@ -188,7 +318,11 @@ const Page = () => {
                                                 <FormItem>
                                                     <FormLabel>Relationship With Apllicant</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Relationship With Apllicant" {...field} />
+                                                        <Input placeholder="Relationship With Apllicant" {...field}
+                                                            value={existData.relationshipWithApllicant || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                            onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                            disabled={existData.state}
+                                                        />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -202,7 +336,11 @@ const Page = () => {
                                                 <FormItem>
                                                     <FormLabel>Monthly Income</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Monthly Income" {...field} />
+                                                        <Input placeholder="Monthly Income" {...field}
+                                                            value={existData.monthlyIncome || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                            onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                            disabled={existData.state}
+                                                        />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -216,7 +354,11 @@ const Page = () => {
                                                 <FormItem>
                                                     <FormLabel>Mobile</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Mobile number" {...field} />
+                                                        <Input placeholder="Mobile number" {...field}
+                                                            value={existData.mobile || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                            onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                            disabled={existData.state}
+                                                        />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -235,7 +377,11 @@ const Page = () => {
                                                 <FormItem>
                                                     <FormLabel>Organization</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Organization" {...field} />
+                                                        <Input placeholder="Organization" {...field}
+                                                            value={existData.organization || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                            onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                            disabled={existData.state}
+                                                        />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -249,7 +395,11 @@ const Page = () => {
                                                 <FormItem>
                                                     <FormLabel>Designation</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Designation" {...field} />
+                                                        <Input placeholder="Designation" {...field}
+                                                            value={existData.designation || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                            onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                            disabled={existData.state}
+                                                        />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -264,7 +414,11 @@ const Page = () => {
                                             <FormItem>
                                                 <FormLabel>Address</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Address" {...field} />
+                                                    <Input placeholder="Address" {...field}
+                                                        value={existData.address || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                        onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                        disabled={existData.state}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -287,7 +441,11 @@ const Page = () => {
                                             <FormItem>
                                                 <FormLabel>Emergency Name</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Emergency Name" {...field} />
+                                                    <Input placeholder="Emergency Name" {...field}
+                                                        value={existData.emergencyName || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                        onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                        disabled={existData.state}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -301,7 +459,11 @@ const Page = () => {
                                             <FormItem>
                                                 <FormLabel>Relationship With Apllicant</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Relationship With Apllicant" {...field} />
+                                                    <Input placeholder="Relationship With Apllicant" {...field}
+                                                        value={existData.eRelationshipWithApllicant || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                        onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                        disabled={existData.state}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -315,7 +477,11 @@ const Page = () => {
                                             <FormItem>
                                                 <FormLabel>Mobile</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Mobile Number" {...field} />
+                                                    <Input placeholder="Mobile Number" {...field}
+                                                        value={existData.eMobile || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                        onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                        disabled={existData.state}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -323,7 +489,7 @@ const Page = () => {
                                     />
                                 </span>
 
-                                
+
                                 <FormField
                                     control={form.control}
                                     name="eCompleteAddress"
@@ -332,7 +498,11 @@ const Page = () => {
                                         <FormItem>
                                             <FormLabel>Complete Address</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Complete Address" {...field} />
+                                                <Input placeholder="Complete Address" {...field}
+                                                    value={existData.eCompleteAddress || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                    onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                    disabled={existData.state}
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -340,7 +510,7 @@ const Page = () => {
                                 />
                             </span>
 
-                            <Button type="submit" className="w-full lg:w-[200px] bg-black text-white font-extrabold hover:bg-gray-600">Submit</Button>
+                            <Button type="submit" disabled={existData.state} className="w-full lg:w-[200px] bg-black text-white font-extrabold hover:bg-gray-600">Save and Next</Button>
                         </form>
                     </Form>
                 </div>

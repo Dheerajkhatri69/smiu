@@ -1,5 +1,5 @@
 import { connectionSrt } from "@/lib/db";
-import { PersonalData } from "@/lib/model/personalData";
+import { DegreeProgramInformation } from "@/lib/model/degreeProgramInformation";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
@@ -8,7 +8,7 @@ export async function GET() {
     let success = true
     try {
         await mongoose.connect(connectionSrt)
-        data = await PersonalData.find();
+        data = await DegreeProgramInformation.find();
     } catch (error) {
         data = { result: "error" }
         success = false
@@ -19,7 +19,7 @@ export async function GET() {
 export async function POST(request) {
     const payload = await request.json()
     await mongoose.connect(connectionSrt)
-    const personalData = new PersonalData(payload)
-    const result = await personalData.save();
+    const degreeProgramInformation = new DegreeProgramInformation(payload)
+    const result = await degreeProgramInformation.save();
     return NextResponse.json({ result, success: true })
 }

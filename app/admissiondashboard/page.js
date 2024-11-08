@@ -8,6 +8,7 @@ function Page() {
 
   const { data: session } = useSession(); // Get session data
 
+  const [username, setUsername] = useState("")
   const [projects, setProjects] = useState([
     {
       title: "Personal Data",
@@ -60,7 +61,7 @@ function Page() {
         }));
         setProjects(updatedProjects);
 
-        return ; // Return the result if data is successfully retrieved
+        return; // Return the result if data is successfully retrieved
       } else {
         console.log("No data found or an error occurred.");
       }
@@ -70,16 +71,40 @@ function Page() {
   };
 
 
+  const getUsername = async (formData) => {
+    try {
+      const personalDataExistResponse = await fetch("/api/admission/personaldataExiste", {
+        method: "POST",
+        body: JSON.stringify({ cnic: formData.cnic, email: formData.email }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const personalDataExistResult = await personalDataExistResponse.json();
+
+      if (personalDataExistResult.exists) {
+        setUsername(personalDataExistResult.data.fname.toUpperCase())
+        return; // Stop further processing if any field exists
+      }
+
+
+    } catch (error) {
+      setMessage("Error: Please check your connection.");
+    }
+  }
 
   useEffect(() => {
     if (session?.user) {
       getUserData(session.user)
+      setUsername(session.user.email)
+      getUsername(session.user)
     }
   }, [session]); // Use effect will run when session changes
 
   return (
     <div className="m-2">
-      <AdmissionHero />
+      <AdmissionHero username={username} />
       <NotificationAddmiss projects={projects} />
     </div>
   );

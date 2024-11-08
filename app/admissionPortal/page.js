@@ -62,7 +62,7 @@ const Page = () => {
     };
 
     return (
-        <div className="font-[sans-serif] max-w-4xl flex items-center mx-auto mt-20 md:h-screen p-4">
+        <div className="font-[sans-serif] max-w-4xl flex items-center mx-auto mt-20 h-screen p-4">
             <div className="grid md:grid-cols-3 items-center shadow-2xl rounded-xl overflow-hidden bg-primary-foreground">
                 <form className="md:col-span-2 w-full py-6 px-6 sm:px-16" onSubmit={handleSubmit}>
                     <div className="mb-6">

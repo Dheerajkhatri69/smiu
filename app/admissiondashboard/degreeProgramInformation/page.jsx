@@ -31,7 +31,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 const Page = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -39,65 +40,76 @@ const Page = () => {
     const [message, setMessage] = useState("");
     const [formData, setFormData] = useState({}); // Store all form data here
     const [selectedDate, setSelectedDate] = useState(null);
+    const [existData, setExistData] = useState({
+        cnic: "",
+        email: "",
+        state: false,
+        choice01: "",
+        choice02: "",
+        choice03: "",
+        choice04: "",
+        choice05: "",
+        choice06: "",
+        choice07: "",
+        choice08: "",
+        degreeProgram: "",
+        finance_scheme: false,
+        immediate_family_to_attend_university: "",
+        transport_facility: false,
+    });
+
+
     // Define the array of program options
     const undergraduateProgramOptions = [
-        { value: "BBA_4_Years", label: "BBA 4 Years" },
-        { value: "BBA_14_Years_Education", label: "BBA (After 14 years of Education)" },
-        { value: "BS_Entrepreneurship", label: "BS (Entrepreneurship)" },
-        { value: "BS_Public_Administration", label: "BS (Public Administration)" },
-        { value: "BS_Economics", label: "BS (Economics)" },
-
-        { value: "BS_Accounting_Finance", label: "BS Accounting & Finance" },
-        { value: "BS_Banking_Finance", label: "BS Banking & Finance" },
-        { value: "BS_Commerce", label: "BS Commerce" },
-
-        { value: "BS_Computer_Science", label: "BS Computer Science" },
-        { value: "BS_Information_Technology", label: "BS Information Technology" },
-        { value: "BS_Cyber_Security", label: "BS Cyber Security" },
-
-        { value: "BS_Software_Engineering", label: "BS Software Engineering" },
-        { value: "BS_Data_Science", label: "BS Data Science" },
-
-        { value: "BS_AI", label: "BS AI" },
-        { value: "BS_Mathematics", label: "BS Mathematics" },
-
-        { value: "BS_Media_Studies", label: "BS Media Studies" },
-
-        { value: "BS_English", label: "BS English" },
-
-        { value: "BS_Development_Studies", label: "BS Development Studies" },
-        { value: "BS_Sociology", label: "BS Sociology" },
-
-        { value: "BEd_4_Years", label: "B.Ed. (04-Years)" },
-        { value: "BEd_2_Years", label: "B.Ed. (02-Years)" },
-        { value: "BEd_1_5_Years", label: "B.Ed. (1.5-Years)" },
-
-        { value: "BS_Environmental_Sciences", label: "BS Environmental Sciences" },
-        { value: "BS_Food_Science_Tech", label: "BS Food Science and Tech" },
+        { value: "BBA 4 Years", label: "BBA 4 Years" },
+        { value: "BBA (After 14 years of Education)", label: "BBA (After 14 years of Education)" },
+        { value: "BS (Entrepreneurship)", label: "BS (Entrepreneurship)" },
+        { value: "BS (Public Administration)", label: "BS (Public Administration)" },
+        { value: "BS (Economics)", label: "BS (Economics)" },
+        { value: "BS Accounting & Finance", label: "BS Accounting & Finance" },
+        { value: "BS Banking & Finance", label: "BS Banking & Finance" },
+        { value: "BS Commerce", label: "BS Commerce" },
+        { value: "BS Computer Science", label: "BS Computer Science" },
+        { value: "BS Information Technology", label: "BS Information Technology" },
+        { value: "BS Cyber Security", label: "BS Cyber Security" },
+        { value: "BS Software Engineering", label: "BS Software Engineering" },
+        { value: "BS Data Science", label: "BS Data Science" },
+        { value: "BS AI", label: "BS AI" },
+        { value: "BS Mathematics", label: "BS Mathematics" },
+        { value: "BS Media Studies", label: "BS Media Studies" },
+        { value: "BS English", label: "BS English" },
+        { value: "BS Development Studies", label: "BS Development Studies" },
+        { value: "BS Sociology", label: "BS Sociology" },
+        { value: "B.Ed. (04-Years)", label: "B.Ed. (04-Years)" },
+        { value: "B.Ed. (02-Years)", label: "B.Ed. (02-Years)" },
+        { value: "B.Ed. (1.5-Years)", label: "B.Ed. (1.5-Years)" },
+        { value: "BS Environmental Sciences", label: "BS Environmental Sciences" },
+        { value: "BS Food Science and Tech", label: "BS Food Science and Tech" },
     ];
+
     const graduateProgramOptions = [
-        { value: "MBA_1_5_Years", label: "MBA 1.5 Years" },
-        { value: "MBA_2_Years", label: "MBA 2 Years" },
-        { value: "MS_Management_Sciences", label: "MS (Management Sciences)" },
-        { value: "MS_Public_Administration", label: "MS (Public Administration)" },
-        { value: "MS_Computer_Science", label: "MS Computer Science" },
-        { value: "MS_Mathematics", label: "MS Mathematics" },
-        { value: "MS_Media_Studies_Research", label: "MS (Media Studies Research Track)" },
-        { value: "MS_Linguistics", label: "MS (Linguistics)" },
-        { value: "MS_Development_Studies", label: "MS Development Studies" },
-        { value: "PGD_EPM", label: "PGD in EPM" },
-        { value: "MS_Education", label: "MS (Education)" },
-        { value: "MS_Environmental_Sciences", label: "MS Environmental Sciences" },
+        { value: "MBA 1.5 Years", label: "MBA 1.5 Years" },
+        { value: "MBA 2 Years", label: "MBA 2 Years" },
+        { value: "MS (Management Sciences)", label: "MS (Management Sciences)" },
+        { value: "MS (Public Administration)", label: "MS (Public Administration)" },
+        { value: "MS Computer Science", label: "MS Computer Science" },
+        { value: "MS Mathematics", label: "MS Mathematics" },
+        { value: "MS (Media Studies Research Track)", label: "MS (Media Studies Research Track)" },
+        { value: "MS (Linguistics)", label: "MS (Linguistics)" },
+        { value: "MS Development Studies", label: "MS Development Studies" },
+        { value: "PGD in EPM", label: "PGD in EPM" },
+        { value: "MS (Education)", label: "MS (Education)" },
+        { value: "MS Environmental Sciences", label: "MS Environmental Sciences" },
     ];
-    const postgraduateProgramOptions = [
 
-        { value: "PhD_Management_Sciences", label: "PhD (Management Sciences)" },
-        { value: "PhD_Computer_Science", label: "PhD Computer Science" },
-        { value: "PhD_AI", label: "PhD Artificial Intelligence (AI)" },
-        { value: "PhD_Mathematics", label: "PhD Mathematics" },
-        { value: "PhD_Media_Studies", label: "PhD Media Studies" },
-        { value: "PhD_Education", label: "PhD Education" },
-        { value: "PhD_Environmental_Sciences", label: "PhD Environmental Sciences" },
+    const postgraduateProgramOptions = [
+        { value: "PhD (Management Sciences)", label: "PhD (Management Sciences)" },
+        { value: "PhD Computer Science", label: "PhD Computer Science" },
+        { value: "PhD Artificial Intelligence (AI)", label: "PhD Artificial Intelligence (AI)" },
+        { value: "PhD Mathematics", label: "PhD Mathematics" },
+        { value: "PhD Media Studies", label: "PhD Media Studies" },
+        { value: "PhD Education", label: "PhD Education" },
+        { value: "PhD Environmental Sciences", label: "PhD Environmental Sciences" },
     ];
 
     // Initialize the form with react-hook-form with validation
@@ -142,20 +154,126 @@ const Page = () => {
 
     const { reset, handleSubmit } = form;
 
-    // Handle form submission
-    const onSubmit = (fullData) => {
 
-        console.log("Form data:", fullData); // Log all form data, including image URL
-        setMessageHead(
-            <>
-                <span className="bg-green-400 p-2">
-                    Success!
-                </span>
-            </>
-        )
-        setMessage("Form submitted successfully!");
+    const { data: session } = useSession(); // Get session data
+    const [user, setUser] = useState(null); // Initialize with null
+
+    useEffect(() => {
+        if (session?.user) {
+            setUser(session.user); // Update user state when session is available
+            getDegreeProgramInformation(session.user);
+            console.log(existData)
+
+        }
+    }, [session]); // Use effect will run when session changes
+
+    const getDegreeProgramInformation = async (formData) => {
+        // const addstudentSignupEmail = async (formData) => {
+        try {
+            const degreeProgramInformationExistResponse = await fetch("/api/admission/degreeProgramInformation/degreeProgramInformationExiste", {
+                method: "POST",
+                body: JSON.stringify({ cnic: formData.cnic, email: formData.email }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const degreeProgramInformationExistResult = await degreeProgramInformationExistResponse.json();
+
+            if (degreeProgramInformationExistResult.exists) {
+                setExistData({
+                    ...degreeProgramInformationExistResult.data // Update the state with the fetched data
+                });
+                return; // Stop further processing if any field exists
+            }
+
+
+        } catch (error) {
+            setMessage("Error: Please check your connection.");
+        }
+    };
+
+
+
+    const useremail = user ? `${user.email || ""}` : "User email";
+    const usercnic = user ? `${user.cnic || ""}` : "User CNIC";
+    // Handle form submission
+    const addDegreeProgramInformation = async (formdata) => {
+        try {
+            let result = await fetch("/api/admission/degreeProgramInformation", {
+                method: "POST",
+                body: JSON.stringify(formdata),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            result = await result.json();
+
+            if (result.success) {
+
+                try {
+                    let response = await fetch(`/api/admission/admissionstate/${formdata.cnic}`, {
+                        method: "PUT",
+                        body: JSON.stringify({
+                            degreeProgramInformation: formdata.state
+                        }),
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+                    response = await response.json();
+                } catch (error) {
+                    console.error("Fetch error:", error);
+                    // Handle the error (e.g., show an error message to the user)
+                }
+
+                setMessageHead(
+                    <span className="bg-green-400 p-2">
+                        Success!
+                    </span>
+                );
+                setMessage("Form submitted successfully!");
+                setIsDialogOpen(true);
+
+                reset(); // Clears all fields to default values
+                // Redirect to /admissiondashboard
+            } else {
+                setMessageHead(
+                    <>
+                        <span className="bg-red-400 p-2">
+                            Error
+                        </span>
+                    </>
+                )
+                setMessage("Error: Unable to add personaldata. Please try again.");
+            }
+        } catch (error) {
+            setMessageHead(
+                <>
+                    <span className="bg-red-400 p-2">
+                        Error
+                    </span>
+                </>
+            )
+            setMessage("Error: Unable to add personaldata. Please check your connection.");
+        }
         setIsDialogOpen(true);
-        reset(); // Clears all fields to default values
+    };
+
+
+    // Handle form submission
+    const onSubmit = (formData) => {
+
+        const fullData = {
+            ...formData,
+            cnic: usercnic,
+            email: useremail,
+            state: true
+        };
+
+        addDegreeProgramInformation(fullData)
+        // console.log("Form data:", fullData); // Log all form data, including image URL
+
     };
     return (
         <div className='relative overflow-hidden'>
@@ -187,7 +305,8 @@ const Page = () => {
                                                             field.onChange(value); // Update form state
                                                             setSelectedDegree(value); // Update local state
                                                         }}
-                                                        value={field.value} // Ensure correct value from form state
+                                                        value={field.value || existData.degreeProgram} // Ensure correct value from form state
+                                                        disabled={existData.state}
                                                     >
                                                         <SelectTrigger className="w-full bg-white/50">
                                                             <SelectValue placeholder="--Select Degree Program--" />
@@ -214,16 +333,18 @@ const Page = () => {
                                                     <FormLabel>1st Choice</FormLabel>
                                                     <FormControl>
                                                         <Select
-                                                            onValueChange={(value) => field.onChange(value)}
-                                                            value={field.value} // Ensure correct value from form state
+                                                            onValueChange={(value) => field.onChange(value)} // Handle value change
+                                                            value={field.value} // Use value from form state, fallback to existData.choice01
+                                                            disabled={existData.state} // Disable the select if the state is true
                                                         >
                                                             <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
                                                                 <SelectValue placeholder="--Select Program--" />
                                                             </SelectTrigger>
                                                             <SelectContent>
+                                                                {/* Map through your program options to create SelectItems */}
                                                                 {getProgramOptions().map((program) => (
                                                                     <SelectItem key={program.value} value={program.value}>
-                                                                        {program.label}
+                                                                        {program.label} {/* Display program label */}
                                                                     </SelectItem>
                                                                 ))}
                                                             </SelectContent>
@@ -243,7 +364,7 @@ const Page = () => {
                                                     <FormControl>
                                                         <Select
                                                             onValueChange={(value) => field.onChange(value)}
-                                                            value={field.value} // Ensure correct value from form state
+                                                            value={field.value || existData.choice02} // Ensure correct value from form state
                                                         >
                                                             <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
                                                                 <SelectValue placeholder="--Select Program--" />
