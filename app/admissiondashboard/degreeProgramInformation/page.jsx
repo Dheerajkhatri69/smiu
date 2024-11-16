@@ -162,8 +162,6 @@ const Page = () => {
         if (session?.user) {
             setUser(session.user); // Update user state when session is available
             getDegreeProgramInformation(session.user);
-            console.log(existData)
-
         }
     }, [session]); // Use effect will run when session changes
 
