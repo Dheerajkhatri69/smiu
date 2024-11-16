@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { useForm } from 'react-hook-form';
 
-import html2pdf from "html2pdf.js"
+// import html2pdf from "html2pdf.js"
 
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
@@ -226,36 +226,36 @@ const page = () => {
   };
   const form = useForm({})
 
-  const slidesRef = useRef(null);
+  // const slidesRef = useRef(null);
   const useremail = user ? `${user.email || ""}` : "User";
   const usercnic = user ? `${user.cnic || ""}` : "User CNIC";
 
-  const generateApplicationFormPDF = () => {
-    const opt = {
-      margin: 0.2,
-      filename: "AdmissionForm.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: {
-        scale: 3, // Increase scale for better quality
-        width: 1024, // Set to laptop screen size
-        windowWidth: 1024, // Simulate a laptop's viewport width
-      },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-    };
+  // const generateApplicationFormPDF = () => {
+  //   const opt = {
+  //     margin: 0.2,
+  //     filename: "AdmissionForm.pdf",
+  //     image: { type: "jpeg", quality: 0.98 },
+  //     html2canvas: {
+  //       scale: 3, // Increase scale for better quality
+  //       width: 1024, // Set to laptop screen size
+  //       windowWidth: 1024, // Simulate a laptop's viewport width
+  //     },
+  //     jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+  //   };
 
-    if (slidesRef.current) {
-      // Ensure the styles match laptop view
-      const container = slidesRef.current;
-      container.style.width = "1024px"; // Set fixed width for rendering
+  //   if (slidesRef.current) {
+  //     // Ensure the styles match laptop view
+  //     const container = slidesRef.current;
+  //     container.style.width = "1024px"; // Set fixed width for rendering
 
-      html2pdf()
-        .from(container)
-        .set(opt)
-        .save();
-    } else {
-      console.error("slidesRef is not attached to any element.");
-    }
-  };
+  //     html2pdf()
+  //       .from(container)
+  //       .set(opt)
+  //       .save();
+  //   } else {
+  //     console.error("slidesRef is not attached to any element.");
+  //   }
+  // };
 
 
   return (
@@ -268,16 +268,16 @@ const page = () => {
             <h6 className='text-green-400'>Your Admission form has been submitted successfully. Please Click "Apllication Updates" menu for further information on Application process.</h6>
           </div>
           <div className='flex gap-2 flex-wrap'>
-            <button onClick={generateApplicationFormPDF}>
+            {/* <button onClick={generateApplicationFormPDF}>
               Download Application Form
-            </button>
+            </button> */}
             <Button variant="secondary" className="bg-green-400">Download Application Form</Button>
             <Button variant="secondary" className="bg-green-400">Download Fee Voucher</Button>
           </div>
         </div>
       </div>
 
-      <div ref={slidesRef} className="flex justify-center self-center z-10 m-2">
+      <div className="flex justify-center self-center z-10 m-2">
         <div className="backdrop-blur-lg border border-white/40 shadow-lg p-12 bg-primary/80 mx-auto rounded-3xl w-full">
           <div className="mb-7">
             <h3 className="font-semibold text-2xl text-gray-800 text-center">Personal Data</h3>
