@@ -1,39 +1,33 @@
 "use client";
 
-import { useSession } from 'next-auth/react';
-import React, { useEffect, useRef, useState } from 'react'
+import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select"
+
 import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useForm } from 'react-hook-form';
+import { useSession } from "next-auth/react";
 
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-const page = () => {
-
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [messageHead, setMessageHead] = useState("");
-  const [message, setMessage] = useState("");
-  const [imageUrl, setImageUrl] = useState(""); // To store the uploaded image URL
-  const [formData, setFormData] = useState({}); // Store all form data here
-  const [selectedDate, setSelectedDate] = useState(null);
+const Page = () => {
   const [existData, setExistData] = useState({
     state: false,
     fname: "",
@@ -55,7 +49,6 @@ const page = () => {
     homephone: "",
     postalAddress: "",
     permanentAddress: "",
-
     choice01: "",
     choice02: "",
     choice03: "",
@@ -68,8 +61,6 @@ const page = () => {
     finance_scheme: false,
     immediate_family_to_attend_university: "",
     transport_facility: false,
-
-
     hsc_alevel_board: "",
     hsc_alevel_degree: "",
     hsc_alevel_examType: "",
@@ -82,8 +73,6 @@ const page = () => {
     hsc_alevel_seatNo: "",
     hsc_alevel_startYear: "",
     hsc_alevel_totalMarks: "",
-
-    // SSC/O-level fields
     ssc_olevel_board: "",
     ssc_olevel_degree: "",
     ssc_olevel_examType: "",
@@ -95,22 +84,29 @@ const page = () => {
     ssc_olevel_percentage: "",
     ssc_olevel_seatNo: "",
     ssc_olevel_startYear: "",
-    ssc_olevel_totalMarks: ""
-
+    ssc_olevel_totalMarks: "",
   });
 
   const { data: session } = useSession(); // Get session data
   const [user, setUser] = useState(null); // Initialize with null
 
   useEffect(() => {
-    if (session?.user) {
-      setUser(session.user); // Update user state when session is available
-      getPersonalData(session.user);
-      getGuardiansData(session.user);
-      getDegreeProgramInformation(session.user);
-      getAcademicData(session.user);
-    }
-  }, [session]); // Use effect will run when session changes
+    const fetchData = async () => {
+      if (session?.user) {
+        setUser(session.user); // Update user state when session is available
+        try {
+          await getPersonalData(session.user);
+          await getGuardiansData(session.user);
+          await getDegreeProgramInformation(session.user);
+          await getAcademicData(session.user);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+    };
+
+    fetchData(); // Call the async function
+  }, [session]);
 
   const getPersonalData = async (formData) => {
     // const addstudentSignupEmail = async (formData) => {
@@ -137,7 +133,7 @@ const page = () => {
 
 
     } catch (error) {
-      setMessage("Error: Please check your connection.");
+      console.log("Error: Please check your connection.");
     }
   };
 
@@ -165,7 +161,7 @@ const page = () => {
 
 
     } catch (error) {
-      setMessage("Error: Please check your connection.");
+      console.log("Error: Please check your connection.");
     }
   };
   const getDegreeProgramInformation = async (formData) => {
@@ -192,7 +188,7 @@ const page = () => {
 
 
     } catch (error) {
-      setMessage("Error: Please check your connection.");
+      console.log("Error: Please check your connection.");
     }
   };
 
@@ -219,10 +215,70 @@ const page = () => {
 
 
     } catch (error) {
-      setMessage("Error: Please check your connection.");
+      console.log("Error: Please check your connection.");
     }
   };
-  const form = useForm({})
+  const form = useForm({
+    defaultValues: {
+      state: false,
+      fname: "",
+      mname: "",
+      lname: "",
+      image: "",
+      fathersName: "",
+      fathersOccupation: "",
+      nationality: "",
+      cnic: "",
+      email: "",
+      dateOfBirth: "",
+      gender: "",
+      religion: "",
+      maritalStatus: "",
+      domicile: "",
+      domicileDistrict: "",
+      mobile: "",
+      homephone: "",
+      postalAddress: "",
+      permanentAddress: "",
+      choice01: "",
+      choice02: "",
+      choice03: "",
+      choice04: "",
+      choice05: "",
+      choice06: "",
+      choice07: "",
+      choice08: "",
+      degreeProgram: "",
+      finance_scheme: false,
+      immediate_family_to_attend_university: "",
+      transport_facility: false,
+      hsc_alevel_board: "",
+      hsc_alevel_degree: "",
+      hsc_alevel_examType: "",
+      hsc_alevel_grade: "",
+      hsc_alevel_group: "",
+      hsc_alevel_institution: "",
+      hsc_alevel_optainedMarks: "",
+      hsc_alevel_passingYear: "",
+      hsc_alevel_percentage: "",
+      hsc_alevel_seatNo: "",
+      hsc_alevel_startYear: "",
+      hsc_alevel_totalMarks: "",
+      ssc_olevel_board: "",
+      ssc_olevel_degree: "",
+      ssc_olevel_examType: "",
+      ssc_olevel_grade: "",
+      ssc_olevel_group: "",
+      ssc_olevel_institution: "",
+      ssc_olevel_optainedMarks: "",
+      ssc_olevel_passingYear: "",
+      ssc_olevel_percentage: "",
+      ssc_olevel_seatNo: "",
+      ssc_olevel_startYear: "",
+      ssc_olevel_totalMarks: ""
+    },
+    mode: "onBlur", // Validate on blur
+  });
 
   const useremail = user ? `${user.email || ""}` : "User";
   const usercnic = user ? `${user.cnic || ""}` : "User CNIC";
@@ -235,7 +291,7 @@ const page = () => {
         <div className="backdrop-blur-lg border border-white/40 shadow-lg p-12 bg-primary-foreground/50 mx-auto rounded-3xl w-full">
           <div className="mb-7">
             <h3 className="font-semibold text-2xl text-gray-800 text-center">Admission Form</h3>
-            <h6 className='text-green-400'>Your Admission form has been submitted successfully. Please Click "Apllication Updates" menu for further information on Application process.</h6>
+            <h6 className='text-green-400'>Your Admission form has been submitted successfully. Please Click Apllication Updates menu for further information on Application process.</h6>
           </div>
           <div className='flex gap-2 flex-wrap'>
             <Button variant="secondary" className="bg-green-400">Download Application Form</Button>
@@ -252,7 +308,6 @@ const page = () => {
 
           <Form {...form}>
             <form className="space-y-8">
-
               <span className="lg:flex lg:space-x-8 justify-between items-center block space-y-8">
                 <span className="flex flex-col space-y-8">
 
@@ -1843,4 +1898,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page;
