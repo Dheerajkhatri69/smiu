@@ -283,377 +283,730 @@ const Page = () => {
                     <div className="mb-7">
                         <h3 className="font-semibold text-2xl text-gray-800 text-center">Degree Program Information</h3>
                     </div>
+                    {!existData.state ?
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-
-                            <span className="lg:flex lg:space-x-8 justify-between items-center block space-y-8">
+                                <span className="lg:flex lg:space-x-8 justify-between items-center block space-y-8">
 
 
-                                <span className="flex flex-col space-y-8 w-full">
+                                    <span className="flex flex-col space-y-8 w-full">
 
+                                        <FormField
+                                            control={form.control}
+                                            rules={validationRules.degreeProgram}
+                                            name="degreeProgram"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Select Degree Program</FormLabel>
+                                                    <FormControl>
+                                                        <Select
+                                                            onValueChange={(value) => {
+                                                                field.onChange(value); // Update form state
+                                                                setSelectedDegree(value); // Update local state
+                                                            }}
+                                                            value={field.value} // Ensure correct value from form state
+                                                        >
+                                                            <SelectTrigger className="w-full bg-white/50">
+                                                                <SelectValue placeholder="--Select Degree Program--" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="undergraduate">Undergraduate</SelectItem>
+                                                                <SelectItem value="graduate">Graduate</SelectItem>
+                                                                <SelectItem value="postgraduate">Postgraduate</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <span className="lg:flex  items-end justify-between block space-y-8">
+
+                                            <FormField
+                                                control={form.control}
+                                                name="choice01"
+                                                rules={validationRules.choice01}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>1st Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                onValueChange={(value) => field.onChange(value)} // Handle value change
+                                                                value={field.value} // Use value from form state, fallback to existData.choice01
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {/* Map through your program options to create SelectItems */}
+                                                                    {getProgramOptions().map((program) => (
+                                                                        <SelectItem key={program.value} value={program.value}>
+                                                                            {program.label} {/* Display program label */}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="choice02"
+                                                rules={validationRules.choice02}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>2nd Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                onValueChange={(value) => field.onChange(value)}
+                                                                value={field.value} // Ensure correct value from form state
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {getProgramOptions().map((program) => (
+                                                                        <SelectItem key={program.value} value={program.value}>
+                                                                            {program.label}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </span>
+                                        <span className="lg:flex  items-end justify-between block space-y-8">
+
+                                            <FormField
+                                                control={form.control}
+                                                rules={validationRules.choice03}
+                                                name="choice03"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>3rd Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                onValueChange={(value) => field.onChange(value)}
+                                                                value={field.value} // Ensure correct value from form state
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {getProgramOptions().map((program) => (
+                                                                        <SelectItem key={program.value} value={program.value}>
+                                                                            {program.label}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="choice04"
+                                                rules={validationRules.choice04}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>4th Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                onValueChange={(value) => field.onChange(value)}
+                                                                value={field.value} // Ensure correct value from form state
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {getProgramOptions().map((program) => (
+                                                                        <SelectItem key={program.value} value={program.value}>
+                                                                            {program.label}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </span>
+                                        <span className="lg:flex  items-end justify-between block space-y-8">
+
+                                            <FormField
+                                                control={form.control}
+                                                name="choice05"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>5th Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                onValueChange={(value) => field.onChange(value)}
+                                                                value={field.value} // Ensure correct value from form state
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {getProgramOptions().map((program) => (
+                                                                        <SelectItem key={program.value} value={program.value}>
+                                                                            {program.label}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="choice06"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>6th Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                onValueChange={(value) => field.onChange(value)}
+                                                                value={field.value} // Ensure correct value from form state
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {getProgramOptions().map((program) => (
+                                                                        <SelectItem key={program.value} value={program.value}>
+                                                                            {program.label}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </span>
+                                        <span className="lg:flex  items-end justify-between block space-y-8">
+
+                                            <FormField
+                                                control={form.control}
+                                                name="choice07"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>7th Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                onValueChange={(value) => field.onChange(value)}
+                                                                value={field.value} // Ensure correct value from form state
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {getProgramOptions().map((program) => (
+                                                                        <SelectItem key={program.value} value={program.value}>
+                                                                            {program.label}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="choice08"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>8th Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                onValueChange={(value) => field.onChange(value)}
+                                                                value={field.value} // Ensure correct value from form state
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {getProgramOptions().map((program) => (
+                                                                        <SelectItem key={program.value} value={program.value}>
+                                                                            {program.label}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </span>
+
+                                    </span>
+
+                                </span>
+                                <span className="flex flex-col gap-8">
                                     <FormField
                                         control={form.control}
-                                        rules={validationRules.degreeProgram}
-                                        name="degreeProgram"
+                                        name="finance_scheme"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Select Degree Program</FormLabel>
+                                                <FormLabel>Check the box if you are interested in Finance Scheme</FormLabel>
                                                 <FormControl>
-                                                    <Select
-                                                        onValueChange={(value) => {
-                                                            field.onChange(value); // Update form state
-                                                            setSelectedDegree(value); // Update local state
-                                                        }}
-                                                        value={field.value || existData.degreeProgram} // Ensure correct value from form state
-                                                        disabled={existData.state}
-                                                    >
-                                                        <SelectTrigger className="w-full bg-white/50">
-                                                            <SelectValue placeholder="--Select Degree Program--" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value="undergraduate">Undergraduate</SelectItem>
-                                                            <SelectItem value="graduate">Graduate</SelectItem>
-                                                            <SelectItem value="postgraduate">Postgraduate</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
+                                                    <div className="flex items-center space-x-2">
+                                                        <Checkbox
+                                                            id="finance_scheme"
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                            className="bg-white"
+                                                        />
+                                                        <label
+                                                            htmlFor="finance_scheme"
+                                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                        >
+                                                            Slep Finance Scheme
+                                                        </label>
+                                                    </div>
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
-                                    <span className="lg:flex  items-end justify-between block space-y-8">
 
-                                        <FormField
-                                            control={form.control}
-                                            name="choice01"
-                                            rules={validationRules.choice01}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>1st Choice</FormLabel>
-                                                    <FormControl>
-                                                        <Select
-                                                            onValueChange={(value) => field.onChange(value)} // Handle value change
-                                                            value={field.value} // Use value from form state, fallback to existData.choice01
-                                                            disabled={existData.state} // Disable the select if the state is true
+                                    <FormField
+                                        control={form.control}
+                                        name="transport_facility"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Check the box if you are interested in Transport Facility</FormLabel>
+                                                <FormControl>
+                                                    <div className="flex items-center space-x-2">
+                                                        <Checkbox
+                                                            id="transport_facility"
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                            className="bg-white"
+                                                        />
+                                                        <label
+                                                            htmlFor="transport_facility"
+                                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                                         >
-                                                            <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
-                                                                <SelectValue placeholder="--Select Program--" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {/* Map through your program options to create SelectItems */}
-                                                                {getProgramOptions().map((program) => (
-                                                                    <SelectItem key={program.value} value={program.value}>
-                                                                        {program.label} {/* Display program label */}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="choice02"
-                                            rules={validationRules.choice02}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>2nd Choice</FormLabel>
-                                                    <FormControl>
-                                                        <Select
-                                                            onValueChange={(value) => field.onChange(value)}
-                                                            value={field.value || existData.choice02} // Ensure correct value from form state
-                                                        >
-                                                            <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
-                                                                <SelectValue placeholder="--Select Program--" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {getProgramOptions().map((program) => (
-                                                                    <SelectItem key={program.value} value={program.value}>
-                                                                        {program.label}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </span>
-                                    <span className="lg:flex  items-end justify-between block space-y-8">
+                                                            Transport Facility
+                                                        </label>
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
 
-                                        <FormField
-                                            control={form.control}
-                                            rules={validationRules.choice03}
-                                            name="choice03"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>3rd Choice</FormLabel>
-                                                    <FormControl>
-                                                        <Select
-                                                            onValueChange={(value) => field.onChange(value)}
-                                                            value={field.value} // Ensure correct value from form state
-                                                        >
-                                                            <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
-                                                                <SelectValue placeholder="--Select Program--" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {getProgramOptions().map((program) => (
-                                                                    <SelectItem key={program.value} value={program.value}>
-                                                                        {program.label}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="choice04"
-                                            rules={validationRules.choice04}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>4th Choice</FormLabel>
-                                                    <FormControl>
-                                                        <Select
-                                                            onValueChange={(value) => field.onChange(value)}
-                                                            value={field.value} // Ensure correct value from form state
-                                                        >
-                                                            <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
-                                                                <SelectValue placeholder="--Select Program--" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {getProgramOptions().map((program) => (
-                                                                    <SelectItem key={program.value} value={program.value}>
-                                                                        {program.label}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </span>
-                                    <span className="lg:flex  items-end justify-between block space-y-8">
-
-                                        <FormField
-                                            control={form.control}
-                                            name="choice05"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>5th Choice</FormLabel>
-                                                    <FormControl>
-                                                        <Select
-                                                            onValueChange={(value) => field.onChange(value)}
-                                                            value={field.value} // Ensure correct value from form state
-                                                        >
-                                                            <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
-                                                                <SelectValue placeholder="--Select Program--" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {getProgramOptions().map((program) => (
-                                                                    <SelectItem key={program.value} value={program.value}>
-                                                                        {program.label}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="choice06"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>6th Choice</FormLabel>
-                                                    <FormControl>
-                                                        <Select
-                                                            onValueChange={(value) => field.onChange(value)}
-                                                            value={field.value} // Ensure correct value from form state
-                                                        >
-                                                            <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
-                                                                <SelectValue placeholder="--Select Program--" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {getProgramOptions().map((program) => (
-                                                                    <SelectItem key={program.value} value={program.value}>
-                                                                        {program.label}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </span>
-                                    <span className="lg:flex  items-end justify-between block space-y-8">
-
-                                        <FormField
-                                            control={form.control}
-                                            name="choice07"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>7th Choice</FormLabel>
-                                                    <FormControl>
-                                                        <Select
-                                                            onValueChange={(value) => field.onChange(value)}
-                                                            value={field.value} // Ensure correct value from form state
-                                                        >
-                                                            <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
-                                                                <SelectValue placeholder="--Select Program--" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {getProgramOptions().map((program) => (
-                                                                    <SelectItem key={program.value} value={program.value}>
-                                                                        {program.label}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="choice08"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>8th Choice</FormLabel>
-                                                    <FormControl>
-                                                        <Select
-                                                            onValueChange={(value) => field.onChange(value)}
-                                                            value={field.value} // Ensure correct value from form state
-                                                        >
-                                                            <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
-                                                                <SelectValue placeholder="--Select Program--" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {getProgramOptions().map((program) => (
-                                                                    <SelectItem key={program.value} value={program.value}>
-                                                                        {program.label}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </span>
+                                    <FormField
+                                        control={form.control}
+                                        name="immediate_family_to_attend_university"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Are you the first person in your immediate family to attend university?</FormLabel>
+                                                <FormControl>
+                                                    <RadioGroup
+                                                        value={field.value}
+                                                        onValueChange={field.onChange}
+                                                    >
+                                                        <div className="flex items-center space-x-2">
+                                                            <RadioGroupItem
+                                                                value="yes"
+                                                                id="immediate_family_yes"
+                                                                className="bg-white text-black"
+                                                            />
+                                                            <Label htmlFor="immediate_family_yes">YES</Label>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <RadioGroupItem
+                                                                value="no"
+                                                                id="immediate_family_no"
+                                                                className="bg-white text-black"
+                                                            />
+                                                            <Label htmlFor="immediate_family_no">NO</Label>
+                                                        </div>
+                                                    </RadioGroup>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
 
                                 </span>
 
-                            </span>
-                            <span className="flex flex-col gap-8">
-                                <FormField
-                                    control={form.control}
-                                    name="finance_scheme"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Check the box if you are interested in Finance Scheme</FormLabel>
-                                            <FormControl>
-                                                <div className="flex items-center space-x-2">
-                                                    <Checkbox
-                                                        id="finance_scheme"
-                                                        checked={field.value}
-                                                        onCheckedChange={field.onChange}
-                                                        className="bg-white"
-                                                    />
-                                                    <label
-                                                        htmlFor="finance_scheme"
-                                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                                    >
-                                                        Slep Finance Scheme
-                                                    </label>
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <Button type="submit" className="w-full lg:w-[200px] bg-black text-white font-extrabold hover:bg-gray-600">Submit</Button>
+                            </form>
+                        </Form>
+                        :
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
-                                <FormField
-                                    control={form.control}
-                                    name="transport_facility"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Check the box if you are interested in Transport Facility</FormLabel>
-                                            <FormControl>
-                                                <div className="flex items-center space-x-2">
-                                                    <Checkbox
-                                                        id="transport_facility"
-                                                        checked={field.value}
-                                                        onCheckedChange={field.onChange}
-                                                        className="bg-white"
-                                                    />
-                                                    <label
-                                                        htmlFor="transport_facility"
-                                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                                    >
-                                                        Transport Facility
-                                                    </label>
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <span className="lg:flex lg:space-x-8 justify-between items-center block space-y-8">
 
-                                <FormField
-                                    control={form.control}
-                                    name="immediate_family_to_attend_university"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Are you the first person in your immediate family to attend university?</FormLabel>
-                                            <FormControl>
-                                                <RadioGroup
-                                                    value={field.value}
-                                                    onValueChange={field.onChange}
-                                                >
+
+                                    <span className="flex flex-col space-y-8 w-full">
+
+                                        <FormField
+                                            control={form.control}
+                                            rules={validationRules.degreeProgram}
+                                            name="degreeProgram"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Select Degree Program</FormLabel>
+                                                    <FormControl>
+                                                        <Select
+                                                            value={existData.degreeProgram} // Ensure correct value from form state
+                                                            disabled={existData.state}
+                                                        >
+                                                            <SelectTrigger className="w-full bg-white/50">
+                                                                <SelectValue placeholder="--Select Degree Program--" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="undergraduate">Undergraduate</SelectItem>
+                                                                <SelectItem value="graduate">Graduate</SelectItem>
+                                                                <SelectItem value="postgraduate">Postgraduate</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <span className="lg:flex  items-end justify-between block space-y-8">
+                                            <FormField
+                                                control={form.control}
+                                                name="choice01"
+                                                rules={validationRules.choice01}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>1st Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                value={existData.choice01} // Use value from form state, fallback to existData.choice01
+                                                                disabled={existData.state}
+
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value={existData.choice01}>
+                                                                        {existData.choice01} {/* Display program label */}
+                                                                    </SelectItem>
+
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="choice02"
+                                                rules={validationRules.choice02}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>2nd Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                value={existData.choice02} // Ensure correct value from form state
+                                                                disabled={existData.state}
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value={existData.choice02}>
+                                                                        {existData.choice02}
+                                                                    </SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </span>
+                                        <span className="lg:flex  items-end justify-between block space-y-8">
+
+                                            <FormField
+                                                control={form.control}
+                                                rules={validationRules.choice03}
+                                                name="choice03"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>3rd Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                value={existData.choice03} // Ensure correct value from form state
+                                                                disabled={existData.state}
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value={existData.choice03}>
+                                                                        {existData.choice03}
+                                                                    </SelectItem>
+
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="choice04"
+                                                rules={validationRules.choice04}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>4th Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                value={existData.choice04 } // Ensure correct value from form state
+                                                                disabled={existData.state}
+
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value={existData.choice04 }>
+                                                                        {existData.choice04 }
+                                                                    </SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </span>
+                                        <span className="lg:flex  items-end justify-between block space-y-8">
+
+                                            <FormField
+                                                control={form.control}
+                                                name="choice05"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>5th Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                value={existData.choice05 || "null"} // Ensure correct value from form state
+                                                                disabled={existData.state}
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value={existData.choice05 || "null"}>
+                                                                        {existData.choice05 || "null"}
+                                                                    </SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="choice06"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>6th Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                value={existData.choice06 || "null"} // Ensure correct value from form state
+                                                                disabled={existData.state}
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value={existData.choice06 || "null"}>
+                                                                        {existData.choice06 || "null"}
+                                                                    </SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </span>
+                                        <span className="lg:flex  items-end justify-between block space-y-8">
+
+                                            <FormField
+                                                control={form.control}
+                                                name="choice07"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>7th Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                value={existData.choice07 || "null"} // Ensure correct value from form state
+                                                                disabled={existData.state}
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value={existData.choice07 || "null"}>
+                                                                        {existData.choice07 || "null"}
+                                                                    </SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="choice08"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>8th Choice</FormLabel>
+                                                        <FormControl>
+                                                            <Select
+                                                                value={existData.choice08 || "null"} // Ensure correct value from form state
+                                                                disabled={existData.state}
+                                                            >
+                                                                <SelectTrigger className="w-full 2xl:w-[500px] lg:w-[300px] bg-white/50">
+                                                                    <SelectValue placeholder="--Select Program--" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value={existData.choice08 || "null"}>
+                                                                        {existData.choice08 || "null"}
+                                                                    </SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </span>
+
+                                    </span>
+
+                                </span>
+                                <span className="flex flex-col gap-8">
+                                    <FormField
+                                        control={form.control}
+                                        name="finance_scheme"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Check the box if you are interested in Finance Scheme</FormLabel>
+                                                <FormControl>
                                                     <div className="flex items-center space-x-2">
-                                                        <RadioGroupItem
-                                                            value="yes"
-                                                            id="immediate_family_yes"
-                                                            className="bg-white text-black"
+                                                        <Checkbox
+                                                            id="finance_scheme"
+                                                            checked={existData.finance_scheme}
+                                                            className="bg-white"
+                                                            disabled={existData.state}
                                                         />
-                                                        <Label htmlFor="immediate_family_yes">YES</Label>
+                                                        <label
+                                                            htmlFor="finance_scheme"
+                                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                        >
+                                                            Slep Finance Scheme
+                                                        </label>
                                                     </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="transport_facility"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Check the box if you are interested in Transport Facility</FormLabel>
+                                                <FormControl>
                                                     <div className="flex items-center space-x-2">
-                                                        <RadioGroupItem
-                                                            value="no"
-                                                            id="immediate_family_no"
-                                                            className="bg-white text-black"
+                                                        <Checkbox
+                                                            id="transport_facility"
+                                                            checked={existData.transport_facility}
+                                                            className="bg-white"
+                                                            disabled={existData.state}
                                                         />
-                                                        <Label htmlFor="immediate_family_no">NO</Label>
+                                                        <label
+                                                            htmlFor="transport_facility"
+                                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                        >
+                                                            Transport Facility
+                                                        </label>
                                                     </div>
-                                                </RadioGroup>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
 
-                            </span>
+                                    <FormField
+                                        control={form.control}
+                                        name="immediate_family_to_attend_university"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Are you the first person in your immediate family to attend university?</FormLabel>
+                                                <FormControl>
+                                                    <RadioGroup
+                                                        value={existData.immediate_family_to_attend_university}
+                                                        disabled={existData.state}
+                                                    >
+                                                        <div className="flex items-center space-x-2">
+                                                            <RadioGroupItem
+                                                                value="yes"
+                                                                id="immediate_family_yes"
+                                                                className="bg-white text-black"
+                                                            />
+                                                            <Label htmlFor="immediate_family_yes">YES</Label>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <RadioGroupItem
+                                                                value="no"
+                                                                id="immediate_family_no"
+                                                                className="bg-white text-black"
+                                                            />
+                                                            <Label htmlFor="immediate_family_no">NO</Label>
+                                                        </div>
+                                                    </RadioGroup>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
 
-                            <Button type="submit" className="w-full lg:w-[200px] bg-black text-white font-extrabold hover:bg-gray-600">Submit</Button>
-                        </form>
-                    </Form>
+                                </span>
+
+                                <Button type="submit" disabled={existData.state} className="w-full lg:w-[200px] bg-black text-white font-extrabold hover:bg-gray-600">Submit</Button>
+                            </form>
+                        </Form>
+
+                    }
                 </div>
             </div>
 

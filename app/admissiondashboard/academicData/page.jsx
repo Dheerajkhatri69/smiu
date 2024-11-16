@@ -28,7 +28,8 @@ import {
 } from "@/components/ui/select"
 
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 const Page = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -36,7 +37,38 @@ const Page = () => {
     const [message, setMessage] = useState("");
     const [formData, setFormData] = useState({}); // Store all form data here
     const [selectedDate, setSelectedDate] = useState(null);
+    const [existData, setExistData] = useState({
+        cnic: "",
+        email: "",
+        state: false,
 
+        hsc_alevel_board: "",
+        hsc_alevel_degree: "",
+        hsc_alevel_examType: "",
+        hsc_alevel_grade: "",
+        hsc_alevel_group: "",
+        hsc_alevel_institution: "",
+        hsc_alevel_optainedMarks: "",
+        hsc_alevel_passingYear: "",
+        hsc_alevel_percentage: "",
+        hsc_alevel_seatNo: "",
+        hsc_alevel_startYear: "",
+        hsc_alevel_totalMarks: "",
+
+        // SSC/O-level fields
+        ssc_olevel_board: "",
+        ssc_olevel_degree: "",
+        ssc_olevel_examType: "",
+        ssc_olevel_grade: "",
+        ssc_olevel_group: "",
+        ssc_olevel_institution: "",
+        ssc_olevel_optainedMarks: "",
+        ssc_olevel_passingYear: "",
+        ssc_olevel_percentage: "",
+        ssc_olevel_seatNo: "",
+        ssc_olevel_startYear: "",
+        ssc_olevel_totalMarks: ""
+    });
 
     // Initialize the form with react-hook-form with validation
     const form = useForm({
@@ -105,21 +137,125 @@ const Page = () => {
 
     const { reset, handleSubmit } = form;
 
-    // Handle form submission
-    const onSubmit = (fullData) => {
 
-        console.log("Form data:", fullData); // Log all form data, including image URL
-        setMessageHead(
-            <>
-                <span className="bg-green-400 p-2">
-                    Success!
-                </span>
-            </>
-        )
-        setMessage("Form submitted successfully!");
-        setIsDialogOpen(true);
-        reset(); // Clears all fields to default values
+    const { data: session } = useSession(); // Get session data
+    const [user, setUser] = useState(null); // Initialize with null
+
+    useEffect(() => {
+        if (session?.user) {
+            setUser(session.user); // Update user state when session is available
+            getAcademicData(session.user);
+
+        }
+    }, [session]); // Use effect will run when session changes
+
+    const getAcademicData = async (formData) => {
+        // const addstudentSignupEmail = async (formData) => {
+        try {
+            const academicDataExistResponse = await fetch("/api/admission/academicData/academicDataExiste", {
+                method: "POST",
+                body: JSON.stringify({ cnic: formData.cnic, email: formData.email }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const academicDataExistResult = await academicDataExistResponse.json();
+
+            if (academicDataExistResult.exists) {
+                setExistData({
+                    ...academicDataExistResult.data // Update the state with the fetched data
+                });
+                return; // Stop further processing if any field exists
+            }
+
+
+        } catch (error) {
+            setMessage("Error: Please check your connection.");
+        }
     };
+
+
+
+    // Handle form submission
+
+    const useremail = user ? `${user.email || ""}` : "User email";
+    const usercnic = user ? `${user.cnic || ""}` : "User CNIC";
+
+    const addAcademicData = async (formdata) => {
+        try {
+            let result = await fetch("/api/admission/academicData", {
+                method: "POST",
+                body: JSON.stringify(formdata),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            result = await result.json();
+
+            if (result.success) {
+
+                try {
+                    let response = await fetch(`/api/admission/admissionstate/${formdata.cnic}`, {
+                        method: "PUT",
+                        body: JSON.stringify({
+                            academicData: formdata.state
+                        }),
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+                    response = await response.json();
+                } catch (error) {
+                    console.error("Fetch error:", error);
+                    // Handle the error (e.g., show an error message to the user)
+                }
+
+                setMessageHead(
+                    <span className="bg-green-400 p-2">
+                        Success!
+                    </span>
+                );
+                setMessage("Form submitted successfully!");
+                setIsDialogOpen(true);
+
+                reset(); // Clears all fields to default values
+                // Redirect to /admissiondashboard
+            } else {
+                setMessageHead(
+                    <>
+                        <span className="bg-red-400 p-2">
+                            Error
+                        </span>
+                    </>
+                )
+                setMessage("Error: Unable to add personaldata. Please try again.");
+            }
+        } catch (error) {
+            setMessageHead(
+                <>
+                    <span className="bg-red-400 p-2">
+                        Error
+                    </span>
+                </>
+            )
+            setMessage("Error: Unable to add personaldata. Please check your connection.");
+        }
+        setIsDialogOpen(true);
+    };
+
+    const onSubmit = (formData) => {
+        const fullData = {
+            ...formData, // Use the form data passed to the onSubmit function
+            cnic: usercnic,
+            email: useremail,
+            state: true
+        };
+
+
+        addAcademicData(fullData)
+    };
+
     return (
         <div className='relative overflow-hidden'>
             <div className="bg-primary-foreground absolute top-0 left-0 bg-gradient-to-b bg-background/50 blur bottom-0 leading-5 h-[50%] rotate-45 w-full overflow-hidden rounded-3xl"></div>
@@ -150,7 +286,8 @@ const Page = () => {
                                                             onValueChange={(value) => {
                                                                 field.onChange(value); // Update form state
                                                             }}
-                                                            value={field.value} // Ensure correct value from form state
+                                                            value={field.value || existData.ssc_olevel_degree} // Ensure correct value from form state
+                                                            disabled={existData.state}
                                                         >
                                                             <SelectTrigger className="w-[200px] bg-white/50">
                                                                 <SelectValue placeholder="-Select Degree-" />
@@ -179,7 +316,8 @@ const Page = () => {
                                                             onValueChange={(value) => {
                                                                 field.onChange(value); // Update form state
                                                             }}
-                                                            value={field.value} // Ensure correct value from form state
+                                                            value={field.value || existData.ssc_olevel_group} // Ensure correct value from form state
+                                                            disabled={existData.state}
                                                         >
                                                             <SelectTrigger className="w-[200px] bg-white/50">
                                                                 <SelectValue placeholder="-Select Group-" />
@@ -207,7 +345,8 @@ const Page = () => {
                                                     <FormControl>
                                                         <Select
                                                             onValueChange={(value) => field.onChange(value)} // Correctly update form state
-                                                            value={field.value} // Ensure form state value is used
+                                                            value={field.value || existData.ssc_olevel_board} // Ensure form state value is used
+                                                            disabled={existData.state}
                                                         >
                                                             <SelectTrigger className="w-[200px] bg-white/50">
                                                                 <SelectValue placeholder="-Select Board-" />
@@ -256,13 +395,15 @@ const Page = () => {
                                                 <FormItem>
                                                     <FormLabel>Institution</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Institution" {...field} />
+                                                        <Input placeholder="Institution" {...field}
+                                                            value={existData.ssc_olevel_institution || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                            onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                            disabled={existData.state} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
-
                                     </span>
 
                                     <span className="lg:flex justify-between block items-end space-y-8">
@@ -274,7 +415,10 @@ const Page = () => {
                                                 <FormItem>
                                                     <FormLabel>Seat No</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" placeholder="Seat No" {...field} />
+                                                        <Input type="number" placeholder="Seat No" {...field}
+                                                            value={existData.ssc_olevel_seatNo || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                            onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                            disabled={existData.state} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -292,7 +436,8 @@ const Page = () => {
                                                             onValueChange={(value) => {
                                                                 field.onChange(value); // Update form state
                                                             }}
-                                                            value={field.value} // Ensure correct value from form state
+                                                            value={field.value || existData.ssc_olevel_examType} // Ensure correct value from form state
+                                                            disabled={existData.state}
                                                         >
                                                             <SelectTrigger className="w-[200px] bg-white/50">
                                                                 <SelectValue placeholder="-Select Exam Type-" />
@@ -315,7 +460,10 @@ const Page = () => {
                                                 <FormItem>
                                                     <FormLabel>Start Year</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" placeholder="Start Year" {...field} />
+                                                        <Input type="number" placeholder="Start Year" {...field}
+                                                            value={existData.ssc_olevel_startYear || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                            onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                            disabled={existData.state} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -329,7 +477,10 @@ const Page = () => {
                                                 <FormItem>
                                                     <FormLabel>Passing Year</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" placeholder="Passing Year" {...field} />
+                                                        <Input type="number" placeholder="Passing Year" {...field}
+                                                            value={existData.ssc_olevel_passingYear || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                            onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                            disabled={existData.state} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -346,7 +497,10 @@ const Page = () => {
                                                 <FormItem>
                                                     <FormLabel>Optained Marks</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" placeholder="Optained Marks" {...field} />
+                                                        <Input type="number" placeholder="Optained Marks" {...field}
+                                                            value={existData.ssc_olevel_optainedMarks || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                            onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                            disabled={existData.state} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -360,7 +514,10 @@ const Page = () => {
                                                 <FormItem>
                                                     <FormLabel>Total Marks</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" placeholder="Total Marks" {...field} />
+                                                        <Input type="number" placeholder="Total Marks" {...field}
+                                                            value={existData.ssc_olevel_totalMarks || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                            onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                            disabled={existData.state} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -374,7 +531,10 @@ const Page = () => {
                                                 <FormItem>
                                                     <FormLabel>Persentage</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" placeholder="Persentage" {...field} />
+                                                        <Input type="number" placeholder="Persentage" {...field}
+                                                            value={existData.ssc_olevel_percentage || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                            onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                            disabled={existData.state} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -392,7 +552,8 @@ const Page = () => {
                                                             onValueChange={(value) => {
                                                                 field.onChange(value); // Update form state
                                                             }}
-                                                            value={field.value} // Ensure correct value from form state
+                                                            value={field.value || existData.ssc_olevel_grade} // Ensure correct value from form state
+                                                            disabled={existData.state}
                                                         >
                                                             <SelectTrigger className="w-[200px] bg-white/50">
                                                                 <SelectValue placeholder="-Select Grade-" />
@@ -434,7 +595,8 @@ const Page = () => {
                                                         onValueChange={(value) => {
                                                             field.onChange(value); // Update form state
                                                         }}
-                                                        value={field.value} // Ensure correct value from form state
+                                                        value={field.value || existData.hsc_alevel_degree} // Ensure correct value from form state
+                                                        disabled={existData.state}
                                                     >
                                                         <SelectTrigger className="w-[200px] bg-white/50">
                                                             <SelectValue placeholder="-Select Degree-" />
@@ -463,7 +625,8 @@ const Page = () => {
                                                         onValueChange={(value) => {
                                                             field.onChange(value); // Update form state
                                                         }}
-                                                        value={field.value} // Ensure correct value from form state
+                                                        value={field.value || existData.hsc_alevel_group} // Ensure correct value from form state
+                                                        disabled={existData.state}
                                                     >
                                                         <SelectTrigger className="w-[200px] bg-white/50">
                                                             <SelectValue placeholder="-Select Group-" />
@@ -492,7 +655,8 @@ const Page = () => {
                                                 <FormControl>
                                                     <Select
                                                         onValueChange={(value) => field.onChange(value)} // Correctly update form state
-                                                        value={field.value} // Ensure form state value is used
+                                                        value={field.value || existData.hsc_alevel_board} // Ensure form state value is used
+                                                        disabled={existData.state}
                                                     >
                                                         <SelectTrigger className="w-[200px] bg-white/50">
                                                             <SelectValue placeholder="-Select Board-" />
@@ -540,7 +704,10 @@ const Page = () => {
                                             <FormItem>
                                                 <FormLabel>Institution</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Institution" {...field} />
+                                                    <Input placeholder="Institution" {...field}
+                                                        value={existData.hsc_alevel_institution || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                        onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                        disabled={existData.state} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -558,7 +725,10 @@ const Page = () => {
                                             <FormItem>
                                                 <FormLabel>Seat No</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" placeholder="Seat No" {...field} />
+                                                    <Input type="number" placeholder="Seat No" {...field}
+                                                        value={existData.hsc_alevel_seatNo || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                        onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                        disabled={existData.state} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -576,7 +746,8 @@ const Page = () => {
                                                         onValueChange={(value) => {
                                                             field.onChange(value); // Update form state
                                                         }}
-                                                        value={field.value} // Ensure correct value from form state
+                                                        value={field.value || existData.hsc_alevel_examType} // Ensure correct value from form state
+                                                        disabled={existData.state}
                                                     >
                                                         <SelectTrigger className="w-[200px] bg-white/50">
                                                             <SelectValue placeholder="-Select Exam Type-" />
@@ -599,7 +770,10 @@ const Page = () => {
                                             <FormItem>
                                                 <FormLabel>Start Year</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" placeholder="Start Year" {...field} />
+                                                    <Input type="number" placeholder="Start Year" {...field}
+                                                        value={existData.hsc_alevel_startYear || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                        onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                        disabled={existData.state} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -613,7 +787,10 @@ const Page = () => {
                                             <FormItem>
                                                 <FormLabel>Passing Year</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" placeholder="Passing Year" {...field} />
+                                                    <Input type="number" placeholder="Passing Year" {...field}
+                                                        value={existData.hsc_alevel_passingYear || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                        onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                        disabled={existData.state} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -630,7 +807,10 @@ const Page = () => {
                                             <FormItem>
                                                 <FormLabel>Optained Marks</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" placeholder="Optained Marks" {...field} />
+                                                    <Input type="number" placeholder="Optained Marks" {...field}
+                                                        value={existData.hsc_alevel_optainedMarks || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                        onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                        disabled={existData.state} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -644,7 +824,10 @@ const Page = () => {
                                             <FormItem>
                                                 <FormLabel>Total Marks</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" placeholder="Total Marks" {...field} />
+                                                    <Input type="number" placeholder="Total Marks" {...field}
+                                                        value={existData.hsc_alevel_totalMarks || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                        onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                        disabled={existData.state} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -658,7 +841,10 @@ const Page = () => {
                                             <FormItem>
                                                 <FormLabel>Persentage</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" placeholder="Persentage" {...field} />
+                                                    <Input type="number" placeholder="Persentage" {...field}
+                                                        value={existData.hsc_alevel_percentage || field.value}  // If existData.mname is present, use it; otherwise, use field.value
+                                                        onChange={field.onChange}               // Keep the input reactive to user input when existData.mname is absent
+                                                        disabled={existData.state} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -676,7 +862,8 @@ const Page = () => {
                                                         onValueChange={(value) => {
                                                             field.onChange(value); // Update form state
                                                         }}
-                                                        value={field.value} // Ensure correct value from form state
+                                                        value={field.value || existData.hsc_alevel_grade} // Ensure correct value from form state
+                                                        disabled={existData.state}
                                                     >
                                                         <SelectTrigger className="w-[200px] bg-white/50">
                                                             <SelectValue placeholder="-Select Grade-" />
@@ -699,7 +886,7 @@ const Page = () => {
                                 </span>
                             </span>
 
-                            <Button type="submit" className="w-full lg:w-[200px] bg-black text-white font-extrabold hover:bg-gray-600">Submit</Button>
+                            <Button type="submit" disabled={existData.state} className="w-full lg:w-[200px] bg-black text-white font-extrabold hover:bg-gray-600">Submit</Button>
                         </form>
                     </Form>
                 </div>
