@@ -20,14 +20,15 @@ import {
 } from "@/components/ui/select"
 
 import { Input } from "@/components/ui/input";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import html2pdf from "html2pdf.js";
+// Dynamically import html2pdf.js with client-side rendering only
+
 const Page = () => {
   const [existData, setExistData] = useState({
     state: false,
@@ -284,42 +285,6 @@ const Page = () => {
   const useremail = user ? `${user.email || ""}` : "User";
   const usercnic = user ? `${user.cnic || ""}` : "User CNIC";
 
-  const slidesRef = useRef(null);
-  const generateApplicationFormPDF = () => {
-    const opt = {
-      margin: 0.01,
-      filename: "AdmissionForm.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: {
-        scale: 3, // Increase scale for better quality
-        width: 1024, // Set to laptop screen size
-        windowWidth: 1024, // Simulate a laptop's viewport width
-      },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-    };
-
-    if (slidesRef.current) {
-      const container = slidesRef.current;
-
-      // Save the original style
-      const originalWidth = container.style.width;
-
-      // Temporarily set the desired width
-      container.style.width = "1024px";
-
-      html2pdf()
-        .from(container)
-        .set(opt)
-        .save()
-        .finally(() => {
-          // Restore the original width after rendering
-          container.style.width = originalWidth;
-        });
-    } else {
-      console.error("slidesRef is not attached to any element.");
-    }
-  };
-
 
   return (
     <div className='relative overflow-hidden'>
@@ -331,12 +296,12 @@ const Page = () => {
             <h6 className='text-green-400'>Your Admission form has been submitted successfully. Please Click Apllication Updates menu for further information on Application process.</h6>
           </div>
           <div className='flex gap-2 flex-wrap'>
-            <Button variant="secondary" onClick={generateApplicationFormPDF} className="bg-green-400">Download Application Form</Button>
+            <Button variant="secondary" className="bg-green-400">Download Application Form</Button>
             <Button variant="secondary" className="bg-green-400">Download Fee Voucher</Button>
           </div>
         </div>
       </div>
-      <div ref={slidesRef}>
+      <div >
 
         <div className="flex justify-center self-center z-10 m-2" >
           <div className="backdrop-blur-lg border border-white/40 shadow-lg p-12 bg-primary/50 mx-auto rounded-3xl w-full">
