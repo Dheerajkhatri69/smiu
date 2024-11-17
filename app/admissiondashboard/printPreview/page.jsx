@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select"
 
 import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 
@@ -28,7 +28,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 // Dynamically import html2pdf.js with client-side rendering only
-
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 const Page = () => {
   const [existData, setExistData] = useState({
     state: false,
@@ -285,7 +286,47 @@ const Page = () => {
   const useremail = user ? `${user.email || ""}` : "User";
   const usercnic = user ? `${user.cnic || ""}` : "User CNIC";
 
-
+  const printRef = useRef(); // Create a reference to the content to print
+  const handlePrint = () => {
+      const container = printRef.current; // Get the element to print
+  
+      // Use html2canvas to convert the content to a canvas
+      html2canvas(container, {
+        useCORS: true, // To handle external images, if any
+        scale: 3, // Higher scale for better quality
+        width: 1024, // Set fixed width for rendering (laptop view)
+        windowWidth: 1024, // Simulate laptop's viewport width
+        scrollX: 0,
+        scrollY: -window.scrollY, // Ensure no scrolling issues
+      })
+        .then((canvas) => {
+          const imgData = canvas.toDataURL("image/jpeg", 0.98); // Get image data (JPEG format)
+  
+          const pdf = new jsPDF("p", "in", "letter"); // Create a jsPDF instance
+          const margin = 0.2; // Define margin (in inches)
+          const pageWidth = pdf.internal.pageSize.getWidth() - 2 * margin; // Width minus margins
+          const pageHeight = pdf.internal.pageSize.getHeight() - 2 * margin; // Height minus margins
+          const imageHeight = canvas.height * pageWidth / canvas.width; // Scale image height
+  
+          // Add the first page with the image
+          pdf.addImage(imgData, "JPEG", margin, margin, pageWidth, imageHeight);
+  
+          let heightLeft = imageHeight - pageHeight;
+  
+          // Add new pages if content overflows
+          while (heightLeft > 0) {
+            pdf.addPage();
+            pdf.addImage(imgData, "JPEG", margin, margin - heightLeft, pageWidth, imageHeight);
+            heightLeft -= pageHeight;
+          }
+  
+          // Save the PDF with the filename "AdmissionForm.pdf"
+          pdf.save("AdmissionForm.pdf");
+        })
+        .catch((error) => {
+          console.error("Error generating PDF:", error);
+        });
+    };
   return (
     <div className='relative overflow-hidden'>
 
@@ -296,12 +337,13 @@ const Page = () => {
             <h6 className='text-green-400'>Your Admission form has been submitted successfully. Please Click Apllication Updates menu for further information on Application process.</h6>
           </div>
           <div className='flex gap-2 flex-wrap'>
-            <Button variant="secondary" className="bg-green-400">Download Application Form</Button>
+            <button onClick={handlePrint}>Print</button>
+            {/* <Button variant="secondary" onClick={handlePrint} className="bg-green-400">Download Application Form</Button> */}
             <Button variant="secondary" className="bg-green-400">Download Fee Voucher</Button>
           </div>
         </div>
       </div>
-      <div >
+      <div ref={printRef}>
 
         <div className="flex justify-center self-center z-10 m-2" >
           <div className="backdrop-blur-lg border border-white/40 shadow-lg p-12 bg-primary/50 mx-auto rounded-3xl w-full">
