@@ -35,6 +35,12 @@ function Page() {
       name: "academicData"
     },
     {
+      title: "Print & Preview",
+      link: "admissiondashboard/printPreview",
+      state: false,
+      name: "academicData"
+    },
+    {
       title: "Final Step Upload Documents",
       link: "/admissiondashboard/finalStepUploadDocuments",
       state: false,

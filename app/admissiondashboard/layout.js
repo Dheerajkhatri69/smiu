@@ -5,7 +5,6 @@ import { AppSidebar } from "@/components/admissiondashboard/app-sidebar";
 const SettingsLayout = ({ children }) => {
     return (
         <>
-
             <SidebarProvider>  {/* Context provider wrapping the entire layout */}
                 <AppSidebar />
                 <div className="w-full">

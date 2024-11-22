@@ -30,6 +30,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 // Dynamically import html2pdf.js with client-side rendering only
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
+import { Logo } from "@/components/Logo/Logo";
+import ChallanComponentAPP from "@/components/admissiondashboard/ChallanComponent";
 const Page = () => {
   const [existData, setExistData] = useState({
     state: false,
@@ -288,45 +290,58 @@ const Page = () => {
 
   const printRef = useRef(); // Create a reference to the content to print
   const handlePrint = () => {
-      const container = printRef.current; // Get the element to print
+    const container = printRef.current; // Get the element to print
   
-      // Use html2canvas to convert the content to a canvas
-      html2canvas(container, {
-        useCORS: true, // To handle external images, if any
-        scale: 3, // Higher scale for better quality
-        width: 1024, // Set fixed width for rendering (laptop view)
-        windowWidth: 1024, // Simulate laptop's viewport width
-        scrollX: 0,
-        scrollY: -window.scrollY, // Ensure no scrolling issues
+    // Use html2canvas to convert the content to a canvas
+    html2canvas(container, {
+      useCORS: true, // Handle external images, if any
+      scale: 3, // Higher scale for better quality
+      width: 1024, // Set fixed width for rendering (laptop view, e.g., 1024px)
+      height: container.scrollHeight, // Ensure we capture the full height of the content
+      windowWidth: 1024, // Simulate laptop screen width (1024px)
+      scrollX: 0,
+      scrollY: -window.scrollY, // Ensure no scrolling issues
+    })
+      .then((canvas) => {
+        const imgData = canvas.toDataURL("image/jpeg", 0.98); // Get image data (JPEG format)
+  
+        const pdf = new jsPDF("p", "mm", "a4"); // Create a jsPDF instance (portrait orientation, A4 size)
+        const pageWidth = pdf.internal.pageSize.getWidth(); // Full page width
+        const pageHeight = pdf.internal.pageSize.getHeight(); // Full page height
+  
+        // Scale the image to fit the page width while maintaining the aspect ratio
+        const imageHeight = (canvas.height * pageWidth) / canvas.width; // Calculate height based on width
+  
+        // Add the image to the first page
+        pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, imageHeight);
+  
+        let heightLeft = imageHeight - pageHeight; // Remaining height after the first page
+        let currentPage = 1; // Start with the first page
+  
+        // Add up to 6 pages, if content overflows
+        while (heightLeft > 0 && currentPage < 6) {
+          pdf.addPage();
+          pdf.addImage(
+            imgData,
+            "JPEG",
+            0,
+            -pageHeight * currentPage,
+            pageWidth,
+            imageHeight
+          );
+          heightLeft -= pageHeight;
+          currentPage++;
+        }
+  
+        // Save the PDF with the filename "AdmissionForm.pdf"
+        pdf.save("AdmissionForm.pdf");
       })
-        .then((canvas) => {
-          const imgData = canvas.toDataURL("image/jpeg", 0.98); // Get image data (JPEG format)
+      .catch((error) => {
+        console.error("Error generating PDF:", error);
+      });
+  };
   
-          const pdf = new jsPDF("p", "in", "letter"); // Create a jsPDF instance
-          const margin = 0.2; // Define margin (in inches)
-          const pageWidth = pdf.internal.pageSize.getWidth() - 2 * margin; // Width minus margins
-          const pageHeight = pdf.internal.pageSize.getHeight() - 2 * margin; // Height minus margins
-          const imageHeight = canvas.height * pageWidth / canvas.width; // Scale image height
-  
-          // Add the first page with the image
-          pdf.addImage(imgData, "JPEG", margin, margin, pageWidth, imageHeight);
-  
-          let heightLeft = imageHeight - pageHeight;
-  
-          // Add new pages if content overflows
-          while (heightLeft > 0) {
-            pdf.addPage();
-            pdf.addImage(imgData, "JPEG", margin, margin - heightLeft, pageWidth, imageHeight);
-            heightLeft -= pageHeight;
-          }
-  
-          // Save the PDF with the filename "AdmissionForm.pdf"
-          pdf.save("AdmissionForm.pdf");
-        })
-        .catch((error) => {
-          console.error("Error generating PDF:", error);
-        });
-    };
+
   return (
     <div className='relative overflow-hidden'>
 
@@ -337,16 +352,35 @@ const Page = () => {
             <h6 className='text-green-400'>Your Admission form has been submitted successfully. Please Click Apllication Updates menu for further information on Application process.</h6>
           </div>
           <div className='flex gap-2 flex-wrap'>
-            <button onClick={handlePrint}>Print</button>
-            {/* <Button variant="secondary" onClick={handlePrint} className="bg-green-400">Download Application Form</Button> */}
-            <Button variant="secondary" className="bg-green-400">Download Fee Voucher</Button>
+            {/* <button >Print</button> */}
+            <Button variant="secondary" onClick={handlePrint} className="bg-green-400">Download Application Form</Button>
+            {/* <Button variant="secondary" className="bg-green-400"></Button> */}
+            <ChallanComponentAPP name={existData.fname+" "+existData.mname+" "+existData.lname} email={existData.email} cnic={existData.cnic} program={existData.choice01}/>
           </div>
         </div>
       </div>
       <div ref={printRef}>
-
         <div className="flex justify-center self-center z-10 m-2" >
           <div className="backdrop-blur-lg border border-white/40 shadow-lg p-12 bg-primary/50 mx-auto rounded-3xl w-full">
+          
+            <div className="flex gap-10 items-center">
+              <div>
+                <Logo size={150} />
+              </div>
+              <div className="flex-col">
+                <p className="text-green-600">
+                  ALMA-MATER OF QUAID-E-AZAM MOHAMMAD ALI JINNAH
+                </p>
+                <p className="text-red-400">
+                  SINDH MADRESSATUL ISLAM UNIVERSITY
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-center self-center z-10 m-2" >
+          <div className="backdrop-blur-lg border border-black shadow-lg p-12 bg-primary/50 mx-auto rounded-3xl w-full">
             <div className="mb-7">
               <h3 className="font-semibold text-2xl text-gray-800 text-center">Personal Data</h3>
             </div>
@@ -757,7 +791,7 @@ const Page = () => {
         </div>
 
         <div className="flex justify-center self-center z-10 m-2">
-          <div className="backdrop-blur-lg border border-white/40 shadow-lg p-12 bg-primary/50 mx-auto rounded-3xl w-full">
+          <div className="backdrop-blur-lg border border-black shadow-lg p-12 bg-primary/50 mx-auto rounded-3xl w-full">
             <div className="mb-7">
               <h3 className="font-semibold text-2xl text-gray-800 text-center">Guardian/Sponsor Information</h3>
             </div>
@@ -1017,7 +1051,7 @@ const Page = () => {
           </div>
         </div>
         <div className="flex justify-center self-center z-10 m-2">
-          <div className="backdrop-blur-lg border border-white/40 shadow-lg p-12 bg-primary/50 mx-auto rounded-3xl w-full">
+          <div className="backdrop-blur-lg border border-black shadow-lg p-12 bg-primary/50 mx-auto rounded-3xl w-full">
             <div className="mb-7">
               <h3 className="font-semibold text-2xl text-gray-800 text-center">Degree Program Information</h3>
             </div>
@@ -1356,7 +1390,7 @@ const Page = () => {
         </div>
 
         <div className="flex justify-center self-center z-10 m-2">
-          <div className="backdrop-blur-lg border border-white/40 shadow-lg p-12 bg-primary/50 mx-auto rounded-3xl w-full">
+          <div className="backdrop-blur-lg border border-black shadow-lg p-12 bg-primary/50 mx-auto rounded-3xl w-full">
             <div className="mb-7">
               <h3 className="font-semibold text-2xl text-gray-800 text-center">SSC / O-LEVEL Eduction</h3>
             </div>

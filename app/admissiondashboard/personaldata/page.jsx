@@ -32,6 +32,7 @@ import { useEffect, useState } from "react";
 import { UploadButton } from "@/utils/uploadthing";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -65,7 +66,7 @@ const Page = () => {
 
 
     // Initialize the form with react-hook-form with validation
-
+    const router = useRouter();
     const { data: session } = useSession(); // Get session data
     const [user, setUser] = useState(null); // Initialize with null
 
@@ -214,6 +215,8 @@ const Page = () => {
                 setMessage("Form submitted successfully!");
                 reset(); // Clears all fields to default values
                 setImageUrl(""); // Clear the image
+
+                router.push("/admissiondashboard/guardiansData");
             } else {
                 setMessageHead(
                     <>

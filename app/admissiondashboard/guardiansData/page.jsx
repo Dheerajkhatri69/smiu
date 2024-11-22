@@ -30,6 +30,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 const Page = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [messageHead, setMessageHead] = useState("");
@@ -110,13 +111,37 @@ const Page = () => {
 
     const { data: session } = useSession(); // Get session data
     const [user, setUser] = useState(null); // Initialize with null
-
+    const router = useRouter();
     useEffect(() => {
         if (session?.user) {
             setUser(session.user); // Update user state when session is available
+            getAdmissionState(session.user)
             getGuardiansData(session.user);
         }
     }, [session]); // Use effect will run when session changes
+
+    const getAdmissionState = async (formdata) => {
+        try {
+            const response = await fetch(`/api/admission/admissionstate/${formdata.cnic}`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch departments");
+            }
+            const data = await response.json();
+            if (!data?.result?.personalData) {
+                setMessageHead(
+                    <span className="bg-yellow-400 p-2">
+                        Alert!
+                    </span>
+                );
+                setMessage("Please fill out the form in sequence before proceeding.");
+                setIsDialogOpen(true);
+                router.push("/admissiondashboard");
+            }
+
+        } catch (error) {
+            alert(error.message);
+        }
+    }
 
     const getGuardiansData = async (formData) => {
         // const addstudentSignupEmail = async (formData) => {
@@ -188,6 +213,7 @@ const Page = () => {
                 setMessage("Form submitted successfully!");
                 setIsDialogOpen(true);
 
+                router.push("/admissiondashboard/degreeProgramInformation");
                 reset(); // Clears all fields to default values
                 // Redirect to /admissiondashboard
             } else {

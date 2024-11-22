@@ -33,6 +33,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -154,16 +155,41 @@ const Page = () => {
 
     const { reset, handleSubmit } = form;
 
-
+    const router = useRouter();
     const { data: session } = useSession(); // Get session data
     const [user, setUser] = useState(null); // Initialize with null
 
     useEffect(() => {
         if (session?.user) {
+            getAdmissionState(session.user)
             setUser(session.user); // Update user state when session is available
             getDegreeProgramInformation(session.user);
         }
     }, [session]); // Use effect will run when session changes
+
+    const getAdmissionState = async (formdata) => {
+        try {
+            const response = await fetch(`/api/admission/admissionstate/${formdata.cnic}`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch departments");
+            }
+            const data = await response.json();
+            if (!data?.result?.guardiansData) {
+                setMessageHead(
+                    <span className="bg-yellow-400 p-2">
+                        Alert!
+                    </span>
+                );
+                setMessage("Please fill out the form in sequence before proceeding.");
+                setIsDialogOpen(true);
+                router.push("/admissiondashboard");
+            }
+
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
 
     const getDegreeProgramInformation = async (formData) => {
         // const addstudentSignupEmail = async (formData) => {
@@ -235,6 +261,8 @@ const Page = () => {
 
                 reset(); // Clears all fields to default values
                 // Redirect to /admissiondashboard
+
+                router.push("/admissiondashboard/academicData");
             } else {
                 setMessageHead(
                     <>
@@ -1000,7 +1028,7 @@ const Page = () => {
 
                                 </span>
 
-                                <Button type="submit" disabled={existData.state} className="w-full lg:w-[200px] bg-black text-white font-extrabold hover:bg-gray-600">Submit</Button>
+                                <Button type="submit" disabled={existData.state} className="w-full lg:w-[200px] bg-black text-white font-extrabold hover:bg-gray-600">Save and Next</Button>
                             </form>
                         </Form>
 
