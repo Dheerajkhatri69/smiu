@@ -23,11 +23,9 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
-
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-// Dynamically import html2pdf.js with client-side rendering only
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { Logo } from "@/components/Logo/Logo";

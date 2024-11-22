@@ -103,6 +103,8 @@ const ChallanComponent = React.forwardRef((props, ref) => (
   </div>
 ));
 
+ChallanComponent.displayName = "ChallanComponent";
+
 const ChallanComponentAPP = (props) => {
   const printRef = useRef(null);
 
