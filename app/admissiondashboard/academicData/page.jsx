@@ -250,7 +250,7 @@ const Page = () => {
                 reset(); // Clears all fields to default values
                 // Redirect to /admissiondashboard
 
-                router.push("/admissiondashboard/academicdata");
+                router.push("/admissiondashboard/printPreview");
             } else {
                 setMessageHead(
                     <>

@@ -30,6 +30,7 @@ import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { Logo } from "@/components/Logo/Logo";
 import ChallanComponentAPP from "@/components/admissiondashboard/ChallanComponent";
+import { useRouter } from "next/navigation";
 const Page = () => {
   const [existData, setExistData] = useState({
     state: false,
@@ -89,7 +90,7 @@ const Page = () => {
     ssc_olevel_startYear: "",
     ssc_olevel_totalMarks: "",
   });
-
+  const router = useRouter();
   const { data: session } = useSession(); // Get session data
   const [user, setUser] = useState(null); // Initialize with null
 
@@ -98,6 +99,7 @@ const Page = () => {
       if (session?.user) {
         setUser(session.user); // Update user state when session is available
         try {
+          await getAdmissionState(session.user)
           await getPersonalData(session.user);
           await getGuardiansData(session.user);
           await getDegreeProgramInformation(session.user);
@@ -110,6 +112,24 @@ const Page = () => {
 
     fetchData(); // Call the async function
   }, [session]);
+
+  const getAdmissionState = async (formdata) => {
+    try {
+        const response = await fetch(`/api/admission/admissionstate/${formdata.cnic}`);
+        if (!response.ok) {
+            throw new Error("Failed to fetch departments");
+        }
+        const data = await response.json();
+        if (!data?.result?.academicData) {
+            alert("Please fill out the form in sequence before proceeding.");
+            router.push("/admissiondashboard");
+        }
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
 
   const getPersonalData = async (formData) => {
     // const addstudentSignupEmail = async (formData) => {
