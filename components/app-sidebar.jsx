@@ -98,8 +98,8 @@ export function AppSidebar({
             url: "/dashboard/studentsignupEmail/addstudentsignupEmail",
           },
           {
-            title: "Tutorials",
-            url: "#",
+            title: "Admission Forms",
+            url: "/dashboard/admission/admissionForms",
           },
           {
             title: "Changelog",
