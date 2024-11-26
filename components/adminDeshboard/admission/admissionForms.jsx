@@ -30,11 +30,7 @@ export function CompAdmissionForms(prom) {
         getPersonalData(prom.item.cnic);
     }, []);
 
-    // useEffect(() => {
-    //     console.log(existData)
-    // }, [existData]);
 
-    
     const getPersonalData = async (fcnic) => {
         // const addstudentSignupEmail = async (formData) => {
         try {
@@ -47,7 +43,7 @@ export function CompAdmissionForms(prom) {
             });
 
             const personalDataExistResult = await personalDataExistResponse.json();
-            console.log(personalDataExistResult.data)
+            // console.log(personalDataExistResult.data)
             if (personalDataExistResult.exists) {
                 setExistData((prevData) => ({
                     ...prevData, // Keep the existing state

@@ -1,5 +1,7 @@
-import {FlickeringGridDemo} from "@/components/Hero";
+// import {FlickeringGridDemo} from "@/components/Hero";
 // import { MacbookScrollDemo } from "@/components/Hero2";
+// import { MacbookScrollDemo } from "@/components/Hero2";
+import { SVGMaskEffectDemo } from "@/components/Hero";
 import Clips from "@/components/smallComp/Clips";
 import { TimelineDemo } from "@/components/smallComp/Department";
 import { CoverDemo } from "@/components/smallComp/Hading";
@@ -13,8 +15,10 @@ import { AnimatedPinDemo } from "@/components/smallComp/Wellcome2";
 export default function Home() {
   return (
     <div className="">
+      <SVGMaskEffectDemo/>
       {/* <MacbookScrollDemo/> */}
-      <FlickeringGridDemo/>
+      {/* <MacbookScrollDemo/> */}
+      {/* <FlickeringGridDemo/> */}
       {/* <SVGMaskEffectDemo /> */}
       <AnimatedPinDemo />
       <TimelineDemo />
