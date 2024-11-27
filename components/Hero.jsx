@@ -6,23 +6,22 @@ export function SVGMaskEffectDemo() {
   return (
     (
       <div
-        className="h-full w-full flex items-center justify-center overflow-hidden bg-[url('/Dep/talpur1.jpg')] bg-cover bg-center"
+        className="h-full w-full flex flex-col items-center justify-center overflow-hidden bg-[url('/Dep/talpur1.jpg')] bg-cover bg-center"
       >
         <MaskContainer
           revealText={
             <p
-              className="container mx-auto text-black/50 text-center  text-4xl font-bold">
-              The first rule of MRR Club is you do not talk about MRR Club. The
-              second rule of MRR Club is you DO NOT talk about MRR Club.
+              className="container mx-auto text-primary/30 text-center  text-4xl font-bold">
+              Welcome To
+              Sindh Madressatul Islam University. 
+              (SMIU) is a chartered University duly recognized by the Higher Education Commission of Pakistan. 
             </p>
           }
           className="h-[60rem] rounded-md">
-            <span className="text-primary">
-            The first rule of <span className="text-red-500">MRR Club</span> is you
-          do not talk about MRR Club. The second rule of MRR Club is you DO NOT
-          talk about <span className="text-red-500">MRR Club</span>.
-        
-            </span>
+          <span className="text-primary">
+            Welcome To <span className="text-red-500">Sindh Madressatul Islam University. </span>
+            (SMIU) is a chartered University duly recognized by the Higher Education Commission of Pakistan. 
+          </span>
         </MaskContainer>
       </div>)
   );
