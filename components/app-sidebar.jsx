@@ -102,8 +102,8 @@ export function AppSidebar({
             url: "/dashboard/admission/admissionForms",
           },
           {
-            title: "Changelog",
-            url: "#",
+            title: "Entry Test",
+            url: "/dashboard/admission/entryTest",
           },
         ],
       },

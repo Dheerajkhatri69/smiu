@@ -67,7 +67,7 @@ const TweetHeader = ({ status, user }) => (
 
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <EllipsisVertical cursor="pointer" />
+                <EllipsisVertical cursor="pointer" className="hover:scale-x-150" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 bg-primary/90">
                 <DropdownMenuLabel>{user.fname}</DropdownMenuLabel>
@@ -186,7 +186,7 @@ const TweetBody = ({ user }) => (
 export const Tweet = (props) => {
 
     return (
-        <div className="flex backdrop-blur-lg border border-white/40 shadow-lg bg-background/50 rounded-3xl size-full flex-col gap-2 border-black p-4">
+        <div className="flex hover:scale-y-105 duration-150 ease-in backdrop-blur-lg border border-white/40 shadow-lg bg-background/50 rounded-3xl size-full flex-col gap-2 border-black p-4">
             <TweetHeader status={props.all} user={props.user} />
             <TweetBody user={props.user} />
         </div>
