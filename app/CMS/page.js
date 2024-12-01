@@ -11,11 +11,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { Eye, EyeOff } from 'lucide-react';
 const Page = () => {
     const [id, setId] = useState("");
     const [password, setPassword] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [message, setMessage] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     const router = useRouter();
 
@@ -90,11 +92,18 @@ const Page = () => {
                             <div className="relative">
                                 <input
                                     placeholder="Password"
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     className="text-sm text-black px-4 py-3 rounded-lg w-full bg-gray-200 focus:bg-gray-100 border border-gray-200 focus:outline-none focus:border-purple-400"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 focus:outline-none"
+                                >
+                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
                             </div>
 
                             <div className="flex items-center justify-between">
