@@ -13,9 +13,10 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookmarkX, CircleCheckBig } from "lucide-react";
+import { ArrowLeft, ArrowLeftCircle, BookmarkX, CircleCheckBig } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 export default function AdminMCQCreator() {
     const [questionL = setQuestionL] = useState(60);
     const [quizNO, setQuizNo] = useState(0);
@@ -100,16 +101,22 @@ export default function AdminMCQCreator() {
             <div className="bg-primary-foreground absolute top-0 left-0 bg-gradient-to-b bg-background/50 blur bottom-0 leading-5 h-[50%] rotate-45 w-full overflow-hidden rounded-3xl"></div>
             <div className="flex justify-center self-center z-10 m-2">
                 <div className="backdrop-blur-lg border flex gap-4 flex-col items-center border-white/40 shadow-lg p-12 bg-primary-foreground/50 mx-auto rounded-3xl w-full">
-                    {
-                        quizData.length > 0 ? null
-                            :
-                            <Input
-                                placeholder="Enter Quiz Code"
-                                type="number"
-                                disabled={quizData.length > 0}
-                                onChange={(e) => setQuizNo(e.target.value)}
-                            />
-                    }
+                    <div className="flex w-full items-center gap-4">
+                        <Link href={"/dashboard/admission/entryTest"} className="flex justify-start">
+                            <ArrowLeftCircle className="text-black" />
+                        </Link>
+                        {
+                            quizData.length > 0 ? null
+                                :
+                                <Input
+                                    placeholder="Enter Quiz Code"
+                                    type="number"
+                                    disabled={quizData.length > 0}
+                                    onChange={(e) => setQuizNo(e.target.value)}
+                                />
+                        }
+                    </div>
+
                     {
                         quizData.length >= questionL ? null :
                             <Card className="min-w-[350px] w-full max-w-[500px] shadow-xl">
