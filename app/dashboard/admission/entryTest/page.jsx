@@ -7,31 +7,35 @@ import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
 const Page = () => {
-  const [existData, setExistData] = useState([]); // Original data
+  const [entryTest, setEntryTest] = useState([]);
   useEffect(() => {
-    getEntryTestQ();
+    getEntryTest();
   }, []);
 
-  const getEntryTestQ = async () => {
-      try {
-          const response = await fetch("/api/admission/entryTestQ");
-          if (!response.ok) {
-              throw new Error("Failed to fetch admission state");
-          }
-          const data = await response.json();
-          console.log(data.result)
-          // Store data.result in state
-          setExistData(data.result);
-          // setFilteredData(data.result); // Initialize filteredData with all data
-      } catch (error) {
-          alert(error.message);
+  const getEntryTest = async () => {
+    try {
+      const response = await fetch("/api/admission/entryTestQ/entryTest");
+      if (!response.ok) {
+        throw new Error("Failed to fetch Entry Test state");
       }
+      const data = await response.json();
+      setEntryTest(data.result);
+    } catch (error) {
+      alert(error.message);
+    }
   };
+
 
   return (
     <div className='z-10 m-2'>
       <div className='flex flex-wrap'>
-        <QuizShow quizNO={1} />
+        {entryTest.map((item, index) => (
+          <div key={index}>
+            <Link href={`/dashboard/admission/entryTest/${item.quizNo}`}>
+              <QuizShow quizNO={item.quizNo} quizDiscription={item.quizDiscription} />
+            </Link>
+          </div>
+        ))}
         <Link href={"/dashboard/admission/entryTest/addTest"}>
           <div className="flex items-center justify-center antialiased">
             <GlowingStarsBackgroundCard>
@@ -42,7 +46,7 @@ const Page = () => {
                 </GlowingStarsDescription>
                 <div
                   className="h-8 w-8 rounded-full text-black flex items-center justify-center">
-                  <CirclePlus size={50}/>
+                  <CirclePlus size={50} />
                 </div>
               </div>
             </GlowingStarsBackgroundCard>

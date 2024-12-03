@@ -19,7 +19,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 export default function AdminMCQCreator() {
     const [questionL = setQuestionL] = useState(60);
+    const [quizDis, setQuizDis] = useState({});
     const [quizNO, setQuizNo] = useState(0);
+    const [quizTitle, setQuizTitle] = useState("");
+    const [quizDiscription, setQuizDiscription] = useState("");
     const [quizData, setQuizData] = useState([]);
     const [question, setQuestion] = useState("");
     const [options, setOptions] = useState(["", "", "", ""]);
@@ -38,7 +41,7 @@ export default function AdminMCQCreator() {
             return;
         }
         const newQuestion = {
-            quizNo: quizNO,
+            quizNo: quizDis.quizNo,
             id: quizData.length + 1,
             question,
             options,
@@ -58,6 +61,9 @@ export default function AdminMCQCreator() {
 
     const addQuiz = async (formData) => {
         setAddButton(true);
+        if (!addEntryTest()) {
+            alert("Error")
+        }
         const totalQuizzes = formData.length;
         let currentProgress = 0; // Local progress tracker
 
@@ -70,6 +76,28 @@ export default function AdminMCQCreator() {
         }
     };
 
+    const addEntryTest = async () => {
+        try {
+            const response = await fetch('/api/admission/entryTestQ/entryTest', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(quizDis),
+            });
+            if (response.ok) {
+                return true; // Return success for progress update
+            } else {
+                const result = await response.json();
+                console.error("Failed to add quiz:", result);
+                return false; // Failed case
+            }
+        } catch (error) {
+            console.error("Error adding quiz:", error);
+            return false; // Error case
+        }
+    }
+    
     const addQuizSingle = async (quiz) => {
 
         try {
@@ -93,7 +121,20 @@ export default function AdminMCQCreator() {
             return false; // Error case
         }
     };
+    const addQuizDis = () => {
+        if (!quizNO || !quizTitle || !quizDiscription) {
+            alert("Please fill all fields and select a valid answer.");
+            return;
+        }
+        const newQuizDis = {
+            quizNo: quizNO,
+            quizDiscription: quizDiscription,
+            quizTitle: quizTitle,
+            state: true
+        };
 
+        setQuizDis(newQuizDis);
+    }
 
     return (
 
@@ -101,24 +142,56 @@ export default function AdminMCQCreator() {
             <div className="bg-primary-foreground absolute top-0 left-0 bg-gradient-to-b bg-background/50 blur bottom-0 leading-5 h-[50%] rotate-45 w-full overflow-hidden rounded-3xl"></div>
             <div className="flex justify-center self-center z-10 m-2">
                 <div className="backdrop-blur-lg border flex gap-4 flex-col items-center border-white/40 shadow-lg p-12 bg-primary-foreground/50 mx-auto rounded-3xl w-full">
-                    <div className="flex w-full items-center gap-4">
+                    <div className="w-full">
                         <Link href={"/dashboard/admission/entryTest"} className="flex justify-start">
                             <ArrowLeftCircle className="text-black" />
                         </Link>
-                        {
-                            quizData.length > 0 ? null
-                                :
-                                <Input
-                                    placeholder="Enter Quiz Code"
-                                    type="number"
-                                    disabled={quizData.length > 0}
-                                    onChange={(e) => setQuizNo(e.target.value)}
-                                />
-                        }
                     </div>
+                    {
+                        quizDis.state ? null
+                            :
+                            <Card className="min-w-[350px] w-full max-w-[500px] shadow-xl">
+                                <CardHeader>
+                                    <CardTitle className="text-center">Create Entry Test</CardTitle>
+                                    <div className="flex justify-between items-center">
+                                        <CardDescription>For Entry Test.</CardDescription>
+                                        <CardDescription className="text-xl font-bold">{quizData.length}/60</CardDescription>
+                                    </div>
+                                    <label className="block font-semibold mb-2">Test No</label>
+                                    <Input
+                                        placeholder="Enter Quiz Code"
+                                        type="number"
+                                        onChange={(e) => setQuizNo(e.target.value)}
+                                    />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="mb-4">
+                                        <label className="block font-semibold mb-2">Title</label>
+                                        <Input
+                                            placeholder="Quiz Name"
+                                            value={quizTitle}
+                                            onChange={(e) => setQuizTitle(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <Input
+                                            placeholder="Discription"
+                                            value={quizDiscription}
+                                            onChange={(e) => setQuizDiscription(e.target.value)}
+                                        />
+                                    </div>
+                                </CardContent>
+                                <CardFooter>
+                                    <Button className="text-black font-bold" onClick={addQuizDis}>Create</Button>
+                                </CardFooter>
+                            </Card>
+
+
+                    }
+
 
                     {
-                        quizData.length >= questionL ? null :
+                        quizData.length >= questionL || !quizDis.state ? null :
                             <Card className="min-w-[350px] w-full max-w-[500px] shadow-xl">
                                 <CardHeader>
                                     <CardTitle className="text-center">Create MCQs</CardTitle>
@@ -128,7 +201,7 @@ export default function AdminMCQCreator() {
                                     </div>
                                     <label className="block font-semibold mb-2">Quiz No</label>
                                     <Input
-                                        value={quizNO}
+                                        value={quizDis.quizNo}
                                         disabled
                                     />
                                 </CardHeader>
@@ -187,7 +260,35 @@ export default function AdminMCQCreator() {
                             {
                                 quizData.length >= questionL ?
                                     <div>
-                                        <Button disabled={addButton} className="text-black" onClick={() => addQuiz(quizData)}>Add Quiz</Button>
+                                        <div className="mb-4">
+
+                                            <label className="block font-semibold mb-2">Test No</label>
+                                            <Input
+                                                placeholder="Enter Quiz Code"
+                                                disabled={quizDis.state}
+                                                type="number"
+                                                value={quizNO}
+                                                onChange={(e) => setQuizNo(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="mb-4">
+                                            <label className="block font-semibold mb-2">Title</label>
+                                            <Input
+                                                placeholder="Quiz Name"
+                                                value={quizTitle}
+                                                disabled={quizDis.state}
+                                                onChange={(e) => setQuizTitle(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="mb-4">
+                                            <Input
+                                                placeholder="Discription"
+                                                value={quizDiscription}
+                                                disabled={quizDis.state}
+                                                onChange={(e) => setQuizDiscription(e.target.value)}
+                                            />
+                                        </div>
+                                        <Button disabled={addButton} className="text-black" onClick={() => addQuiz(quizData)}>Add Test</Button>
                                         <Progress value={progress} className="w-full mt-2" />
                                     </div> : null
                             }
