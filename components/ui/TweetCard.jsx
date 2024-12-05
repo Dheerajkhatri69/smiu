@@ -1,7 +1,15 @@
 'use client'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Check, DatabaseIcon, Delete, EllipsisVertical, Loader2, MessageCircle, } from "lucide-react";
-
+import { Check, DatabaseIcon, Delete, EllipsisVertical, Loader2, MessageCircle, Trash, } from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,8 +23,7 @@ import {
 import { Cross1Icon } from "@radix-ui/react-icons";
 import { Button } from "./button";
 import Link from "next/link";
-
-
+import { useState } from "react";
 
 const Verified = ({ className, ...props }) => (
     <svg
@@ -37,7 +44,7 @@ const truncate = (str, length) => {
 };
 
 
-const TweetHeader = ({ status, user }) => (
+const TweetHeader = ({ status, user, deleteUser }) => (
     <div className="flex flex-row justify-between tracking-tight">
         <div className="flex items-center space-x-2">
             <Avatar>
@@ -122,10 +129,14 @@ const TweetHeader = ({ status, user }) => (
                     <span>Message</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                    <Delete />
-                    <span>Delete</span>
-                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                <DropdownMenuItem className="p-0">
+                    <Button className="w-full p-1 text-red-500 font-bold"
+                        onClick={() => deleteUser(user.cnic)} // Pass cnic to deleteUser
+                    >
+                        <Trash />
+                        <span>Delete</span>
+                        <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                    </Button>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
@@ -179,16 +190,197 @@ const TweetBody = ({ user }) => (
                     All Info
                 </Button>
             </Link>
-
         </div>
     </div>
 );
 export const Tweet = (props) => {
 
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [message, setMessage] = useState("");
+    const [messageHead, setMessageHead] = useState("");
+
+
+    const deleteUser = async (cnic) => {
+        try {
+            // Define all delete functions in sequence
+            const deleteSteps = [
+                deleteuploadDocuments,
+                deleteacademicData,
+                deletedegreeProgramInformation,
+                deleteguardiansData,
+                deletepersonaldata,
+                deleteadmissionstate,
+            ];
+
+            // Iterate through each delete function
+            for (const step of deleteSteps) {
+                const isDeleted = await step(cnic);
+                if (!isDeleted) {
+                    setMessageHead("Deletion Failed");
+                    setMessage("An error occurred while deleting data. Please try again.");
+                    setIsDialogOpen(true);
+                    return; // Exit early if any step fails
+                }
+            }
+            // Success message
+            setMessageHead("Deletion Successful");
+            setMessage("All related data has been deleted successfully.");
+            setIsDialogOpen(true);
+        } catch (error) {
+            console.error("Error during deletion:", error);
+            setMessageHead("Error");
+            setMessage("An unexpected error occurred. Please contact support.");
+            setIsDialogOpen(true);
+        }
+    };
+
+    const deleteadmissionstate = async (cnic) => {
+        try {
+            const response = await fetch(`/api/admission/admissionstate/${cnic}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                return true; // Success message
+            } else {
+                alert(data.error || data.message); // Error message
+                return false;
+            }
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            alert("An error occurred while deleting the user.");
+            return false;
+        }
+    };
+
+    const deletepersonaldata = async (cnic) => {
+        try {
+            const response = await fetch("/api/admission/personaldataExiste/usingCnic", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ cnic }),
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                return true; // Success message
+            } else {
+                alert(data.error || data.message); // Error message
+            }
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            alert("An error occurred while deleting the user.");
+        }
+    }
+    const deleteuploadDocuments = async (cnic) => {
+        try {
+            const response = await fetch("/api/admission/uploadDocuments/uploadDocumentsExiste", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ cnic }),
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                return true; // Success message
+            } else {
+                alert(data.error || data.message); // Error message
+            }
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            alert("An error occurred while deleting the user.");
+        }
+    }
+
+    const deletedegreeProgramInformation = async (cnic) => {
+        try {
+            const response = await fetch("/api/admission/degreeProgramInformation/degreeProgramInformationExiste", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ cnic }),
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                return true; // Success message
+            } else {
+                alert(data.error || data.message); // Error message
+            }
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            alert("An error occurred while deleting the user.");
+        }
+    }
+    const deleteacademicData = async (cnic) => {
+        try {
+            const response = await fetch("/api/admission/academicData/academicDataExiste", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ cnic }),
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                return true; // Success message
+            } else {
+                alert(data.error || data.message); // Error message
+            }
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            alert("An error occurred while deleting the user.");
+        }
+    }
+
+    const deleteguardiansData = async (cnic) => {
+        try {
+            const response = await fetch("/api/admission/guardiansData/guardiansDataExiste", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ cnic }),
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                return true; // Success message
+            } else {
+                alert(data.error || data.message); // Error message
+            }
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            alert("An error occurred while deleting the user.");
+        }
+    }
     return (
         <div className="flex hover:scale-y-105 duration-150 ease-in backdrop-blur-lg border border-white/40 shadow-lg bg-background/50 rounded-3xl size-full flex-col gap-2 border-black p-4">
-            <TweetHeader status={props.all} user={props.user} />
+            <TweetHeader status={props.all} user={props.user} deleteUser={deleteUser}/>
             <TweetBody user={props.user} />
+
+            <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <AlertDialogContent className="rounded-md">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{messageHead}</AlertDialogTitle>
+                        <AlertDialogDescription>{message}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>Close</AlertDialogCancel>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };

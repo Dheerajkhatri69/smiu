@@ -1,6 +1,8 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeftCircle } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function AdminMCQCreator({ params }) {
@@ -29,6 +31,11 @@ export default function AdminMCQCreator({ params }) {
             <div className="bg-primary-foreground absolute top-0 left-0 bg-gradient-to-b bg-background/50 blur bottom-0 leading-5 h-[50%] rotate-45 w-full overflow-hidden rounded-3xl"></div>
             <div className="flex justify-center self-center z-10 m-2">
                 <div className="backdrop-blur-lg border flex gap-4 flex-col items-center border-white/40 shadow-lg p-12 bg-primary-foreground/50 mx-auto rounded-3xl w-full">
+                    <div className="w-full">
+                        <Link href={"/dashboard/admission/entryTest"} className="flex justify-start">
+                            <ArrowLeftCircle size={50} className="text-black" />
+                        </Link>
+                    </div>
                     <Card className="min-w-[350px] w-full max-w-[500px]">
                         <CardHeader>
                             <CardTitle>Questions</CardTitle>
@@ -36,27 +43,32 @@ export default function AdminMCQCreator({ params }) {
                         </CardHeader>
                         <CardContent>
                             <ul className="space-y-4">
-                                {quizData.map((q) => (
-                                    <li key={q.id} className="p-4 bg-gray-100 rounded-md hover:scale-105 hover:bg-primary/50 shadow-xl duration-150 ease-in">
-                                        <div className="">    
-                                        <p className="font-bold">Q.No: {q.id}</p>
-                                        <p className="font-bold">{q.question}</p>
-                                        </div>
-                                        <ul className="mt-2">
-                                            {q.options.map((option, index) => (
-                                                <li key={index} className="flex items-center">
-                                                    <span className="mr-2">{index + 1}.</span>
-                                                    <span>{option}</span>
-                                                    {option === q.answer && (
-                                                        <span className="ml-2 text-green-500 font-bold">
-                                                            (Correct)
-                                                        </span>
-                                                    )}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </li>
-                                ))}
+                                {quizData
+                                    .sort((a, b) => a.id - b.id) // Sort in ascending order of q.id
+                                    .map((q) => (
+                                        <li
+                                            key={q.id}
+                                            className="p-4 bg-gray-100 rounded-md hover:scale-105 hover:bg-primary/50 shadow-xl duration-150 ease-in"
+                                        >
+                                            <div>
+                                                <p className="font-bold">Q.No: {q.id}</p>
+                                                <p className="font-bold">{q.question}</p>
+                                            </div>
+                                            <ul className="mt-2">
+                                                {q.options.map((option, index) => (
+                                                    <li key={index} className="flex items-center">
+                                                        <span className="mr-2">{index + 1}.</span>
+                                                        <span>{option}</span>
+                                                        {option === q.answer && (
+                                                            <span className="ml-2 text-green-500 font-bold">
+                                                                (Correct)
+                                                            </span>
+                                                        )}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </li>
+                                    ))}
                             </ul>
                         </CardContent>
                     </Card>

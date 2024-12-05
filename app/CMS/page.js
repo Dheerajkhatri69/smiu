@@ -11,23 +11,27 @@ import {
 } from "@/components/ui/alert-dialog";
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 const Page = () => {
     const [id, setId] = useState("");
     const [password, setPassword] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [message, setMessage] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const router = useRouter();
 
     const handleSubmit = async (e) => {
+        setIsLoading(true);
         e.preventDefault();
 
         // Validate ID and password
         if (!id || !password) {
             setMessage("Please enter both ID and password.");
             setIsDialogOpen(true);
+            setIsLoading(false);
             return;
         }
 
@@ -44,6 +48,7 @@ const Page = () => {
             if (res.error) {
                 console.error("Sign-in error:", res.error);
                 setMessage("Invalid credentials");
+                setIsLoading(false);
                 setIsDialogOpen(true);
                 return;
             }
@@ -114,12 +119,16 @@ const Page = () => {
                                 </div>
                             </div>
                             <div>
-                                <button
+                                <Button
                                     type="submit"
                                     className="w-full flex justify-center bg-primary hover:bg-primary/80 text-black p-3 rounded-lg tracking-wide font-semibold cursor-pointer transition ease-in duration-500"
                                 >
-                                    Sign In
-                                </button>
+                                    {isLoading ? (
+                                        <Loader2 className="animate-spin" />
+                                    ) : (
+                                        "Sign In"
+                                    )}
+                                </Button>
                             </div>
                             <div className="flex items-center justify-center space-x-2 my-5">
                                 <span className="h-px w-16 bg-black"></span>

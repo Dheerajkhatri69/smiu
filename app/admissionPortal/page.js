@@ -13,10 +13,13 @@ import {
     AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 const Page = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [message, setMessage] = useState("");
@@ -25,10 +28,12 @@ const Page = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true)
 
         // Validate email and password
         if (!email || !password) {
             setMessage("Please enter both email and password.");
+            setIsLoading(false);
             setIsDialogOpen(true);
             return;
         }
@@ -47,6 +52,7 @@ const Page = () => {
             if (!res.ok || res.error) {
                 console.error("Sign-in error:", res.error);
                 setMessage("Invalid credentials. Please check your email and password.");
+                setIsLoading(false)
                 setIsDialogOpen(true);
                 return;
             }
@@ -104,12 +110,16 @@ const Page = () => {
                     </div>
 
                     <div className="!mt-12">
-                        <button
+                        <Button
                             type="submit"
                             className="w-full py-3 px-4 tracking-wider text-sm rounded-md text-white bg-gray-700 hover:bg-gray-800 focus:outline-none"
                         >
-                            Login
-                        </button>
+                            {isLoading ? (
+                                <Loader2 className="animate-spin" />
+                            ) : (
+                                "Login"
+                            )}
+                        </Button>
                     </div>
                     {/* eslint-disable-next-line react/no-unescaped-entities */}
                     <p className="text-gray-800 text-sm mt-6 text-center">
