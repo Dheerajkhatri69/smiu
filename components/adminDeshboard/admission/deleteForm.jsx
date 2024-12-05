@@ -1,14 +1,13 @@
-const deleteUser = (cnic) => {
+const deleteUser = (state, cnic) => {
     return [
-        () => deleteuploadDocuments(cnic),
-        () => deleteacademicData(cnic),
-        () => deletedegreeProgramInformation(cnic),
-        () => deleteguardiansData(cnic),
-        () => deletepersonaldata(cnic),
+        state.finalStepUploadDocuments && (() => deleteuploadDocuments(cnic)),
+        state.academicData && (() => deleteacademicData(cnic)),
+        state.degreeProgramInformation && (() => deletedegreeProgramInformation(cnic)),
+        state.guardiansData && (() => deleteguardiansData(cnic)),
+        state.personalData && (() => deletepersonaldata(cnic)),
         () => deleteadmissionstate(cnic),
-    ];
+    ].filter(Boolean); // Removes any falsy steps
 };
-
 
 const deleteadmissionstate = async (cnic) => {
     try {

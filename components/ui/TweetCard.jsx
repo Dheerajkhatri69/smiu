@@ -1,6 +1,6 @@
 'use client'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Check, DatabaseIcon, Delete, EllipsisVertical, Loader2, MessageCircle, Trash, } from "lucide-react";
+import { Check, DatabaseIcon, Delete, EllipsisVertical, Loader2, MessageCircle, SendHorizontal, Trash, } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogContent,
@@ -119,9 +119,18 @@ const TweetHeader = ({ status, user, deleteUser }) => (
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                     <DropdownMenuItem>
-                        <DatabaseIcon />
-                        <span>All Information</span>
+                        <SendHorizontal />
+                        <span>Invite For Test</span>
                     </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                    <Link href={`/dashboard/admission/admissionForms/${user.cnic}`}>
+                        <DropdownMenuItem>
+                            <DatabaseIcon />
+                            <span>All Information</span>
+                        </DropdownMenuItem>
+                    </Link>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
@@ -202,27 +211,34 @@ export const Tweet = (props) => {
 
     const deleteUser = async (cnic) => {
         try {
-            // Define all delete functions in sequence
-            const deleteSteps = [
-                deleteuploadDocuments,
-                deleteacademicData,
-                deletedegreeProgramInformation,
-                deleteguardiansData,
-                deletepersonaldata,
-                deleteadmissionstate,
-            ];
+            const state = await getAdmissionState(cnic);
+            if (!state) {
+                setMessageHead("Error");
+                setMessage("Unable to fetch admission state. Please try again.");
+                setIsDialogOpen(true);
+                return;
+            }
 
-            // Iterate through each delete function
+            const deleteSteps = [
+                state.finalStepUploadDocuments && deleteuploadDocuments,
+                state.academicData && deleteacademicData,
+                state.degreeProgramInformation && deletedegreeProgramInformation,
+                state.guardiansData && deleteguardiansData,
+                state.personalData && deletepersonaldata,
+                deleteadmissionstate,
+            ].filter(Boolean);
+
             for (const step of deleteSteps) {
                 const isDeleted = await step(cnic);
                 if (!isDeleted) {
+                    console.error(`Deletion failed at step: ${step.name}`);
                     setMessageHead("Deletion Failed");
                     setMessage("An error occurred while deleting data. Please try again.");
                     setIsDialogOpen(true);
-                    return; // Exit early if any step fails
+                    return;
                 }
             }
-            // Success message
+
             setMessageHead("Deletion Successful");
             setMessage("All related data has been deleted successfully.");
             setIsDialogOpen(true);
@@ -234,6 +250,19 @@ export const Tweet = (props) => {
         }
     };
 
+    const getAdmissionState = async (cnic) => {
+        try {
+            const response = await fetch(`/api/admission/admissionstate/${cnic}`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch admission state");
+            }
+            const data = await response.json();
+            return data.result;
+        } catch (error) {
+            console.error("Error fetching admission state:", error.message);
+            return {};
+        }
+    };
     const deleteadmissionstate = async (cnic) => {
         try {
             const response = await fetch(`/api/admission/admissionstate/${cnic}`, {
@@ -367,7 +396,7 @@ export const Tweet = (props) => {
     }
     return (
         <div className="flex hover:scale-y-105 duration-150 ease-in backdrop-blur-lg border border-white/40 shadow-lg bg-background/50 rounded-3xl size-full flex-col gap-2 border-black p-4">
-            <TweetHeader status={props.all} user={props.user} deleteUser={deleteUser}/>
+            <TweetHeader status={props.all} user={props.user} deleteUser={deleteUser} />
             <TweetBody user={props.user} />
 
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

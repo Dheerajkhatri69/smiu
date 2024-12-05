@@ -115,20 +115,20 @@ const Page = () => {
 
   const getAdmissionState = async (formdata) => {
     try {
-        const response = await fetch(`/api/admission/admissionstate/${formdata.cnic}`);
-        if (!response.ok) {
-            throw new Error("Failed to fetch departments");
-        }
-        const data = await response.json();
-        if (!data?.result?.academicData) {
-            alert("Please fill out the form in sequence before proceeding.");
-            router.push("/admissiondashboard");
-        }
+      const response = await fetch(`/api/admission/admissionstate/${formdata.cnic}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch departments");
+      }
+      const data = await response.json();
+      if (!data?.result?.academicData) {
+        alert("Please fill out the form in sequence before proceeding.");
+        router.push("/admissiondashboard");
+      }
 
     } catch (error) {
-        alert(error.message);
+      alert(error.message);
     }
-}
+  }
 
 
   const getPersonalData = async (formData) => {
@@ -309,7 +309,7 @@ const Page = () => {
   const printRef = useRef(); // Create a reference to the content to print
   const handlePrint = () => {
     const container = printRef.current; // Get the element to print
-  
+
     // Use html2canvas to convert the content to a canvas
     html2canvas(container, {
       useCORS: true, // Handle external images, if any
@@ -322,20 +322,20 @@ const Page = () => {
     })
       .then((canvas) => {
         const imgData = canvas.toDataURL("image/jpeg", 0.98); // Get image data (JPEG format)
-  
+
         const pdf = new jsPDF("p", "mm", "a4"); // Create a jsPDF instance (portrait orientation, A4 size)
         const pageWidth = pdf.internal.pageSize.getWidth(); // Full page width
         const pageHeight = pdf.internal.pageSize.getHeight(); // Full page height
-  
+
         // Scale the image to fit the page width while maintaining the aspect ratio
         const imageHeight = (canvas.height * pageWidth) / canvas.width; // Calculate height based on width
-  
+
         // Add the image to the first page
         pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, imageHeight);
-  
+
         let heightLeft = imageHeight - pageHeight; // Remaining height after the first page
         let currentPage = 1; // Start with the first page
-  
+
         // Add up to 6 pages, if content overflows
         while (heightLeft > 0 && currentPage < 6) {
           pdf.addPage();
@@ -350,7 +350,7 @@ const Page = () => {
           heightLeft -= pageHeight;
           currentPage++;
         }
-  
+
         // Save the PDF with the filename "AdmissionForm.pdf"
         pdf.save("AdmissionForm.pdf");
       })
@@ -358,7 +358,7 @@ const Page = () => {
         console.error("Error generating PDF:", error);
       });
   };
-  
+
 
   return (
     <div className='relative overflow-hidden'>
@@ -373,14 +373,14 @@ const Page = () => {
             {/* <button >Print</button> */}
             <Button variant="secondary" onClick={handlePrint} className="bg-green-400">Download Application Form</Button>
             {/* <Button variant="secondary" className="bg-green-400"></Button> */}
-            <ChallanComponentAPP name={existData.fname+" "+existData.mname+" "+existData.lname} email={existData.email} cnic={existData.cnic} program={existData.choice01}/>
+            <ChallanComponentAPP name={existData.fname + " " + existData.mname + " " + existData.lname} email={existData.email} cnic={existData.cnic} program={existData.choice01} />
           </div>
         </div>
       </div>
       <div ref={printRef}>
         <div className="flex justify-center self-center z-10 m-2" >
           <div className="backdrop-blur-lg border border-white/40 shadow-lg p-12 bg-primary/50 mx-auto rounded-3xl w-full">
-          
+
             <div className="flex gap-10 items-center">
               <div>
                 <Logo size={150} />

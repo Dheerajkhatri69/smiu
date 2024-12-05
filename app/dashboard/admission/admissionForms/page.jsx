@@ -82,46 +82,69 @@ const Page = () => {
         }
 
     }
+    const getAdmissionStateS = async (cnic) => {
+        try {
+            const response = await fetch(`/api/admission/admissionstate/${cnic}`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch admission state");
+            }
+            const data = await response.json();
+            return data.result;
+        } catch (error) {
+            console.error("Error fetching admission state:", error.message);
+            return null; // Explicitly return null to indicate failure
+        }
+    };
+    
     const deleteSelectedUser = async () => {
         const failedCNICs = [];
         const successfulCNICs = [];
     
         for (const cnic of selectedCNICs) {
-            const deleteSteps = deleteUser(cnic);
-            let allStepsSuccessful = true;
-    
-            for (const step of deleteSteps) {
-                const isDeleted = await step(); // Execute each step (now it includes cnic)
-                if (!isDeleted) {
-                    allStepsSuccessful = false;
-                    failedCNICs.push(cnic); // Mark as failed
-                    break; // Exit steps loop if one fails
+            try {
+                const state = await getAdmissionStateS(cnic);
+                if (!state) {
+                    console.error(`Failed to fetch state for CNIC: ${cnic}`);
+                    failedCNICs.push(cnic);
+                    continue; // Skip this CNIC and move to the next
                 }
+    
+                const deleteSteps = deleteUser(state, cnic);
+                let allStepsSuccessful = true;
+    
+                for (const step of deleteSteps) {
+                    const isDeleted = await step(); // Execute each deletion step
+                    if (!isDeleted) {
+                        allStepsSuccessful = false;
+                        failedCNICs.push(cnic);
+                        break; // Stop further steps if one fails
+                    }
+                }
+    
+                if (allStepsSuccessful) {
+                    successfulCNICs.push(cnic);
+                }
+            } catch (error) {
+                console.error(`Unexpected error during deletion for CNIC ${cnic}:`, error.message);
+                failedCNICs.push(cnic);
             }
-    
-            if (allStepsSuccessful) {
-                successfulCNICs.push(cnic); // Mark as successful
-            }
         }
     
-        // Construct a single message after processing
-        if (failedCNICs.length > 0) {
-            setMessageHead("Deletion Failed");
-            setMessage(
-                `Failed to delete data for CNICs: ${failedCNICs.join(", ")}. Please try again.`
-            );
+        // Display consolidated message
+        if (failedCNICs.length > 0 || successfulCNICs.length > 0) {
+            setMessageHead("Deletion Summary");
+            setMessage(`
+                ${successfulCNICs.length > 0 ? `Successfully deleted data for CNICs: ${successfulCNICs.join(", ")}.` : ""}
+                ${failedCNICs.length > 0 ? `Failed to delete data for CNICs: ${failedCNICs.join(", ")}.` : ""}
+            `);
+            setIsDialogOpen(true);
+        } else {
+            setMessageHead("No Deletion Performed");
+            setMessage("No CNICs were successfully processed.");
+            setIsDialogOpen(true);
         }
-    
-        if (successfulCNICs.length > 0) {
-            setMessageHead("Deletion Successful");
-            setMessage(
-                `Successfully deleted data for CNICs: ${successfulCNICs.join(", ")}.`
-            );
-        }
-    
-        setIsDialogOpen(true); // Open dialog at the end
     };
-    
+     
     return (
         <div className="flex flex-col gap-2">
             <div className="flex justify-between mx-2">
