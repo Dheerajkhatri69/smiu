@@ -1,6 +1,6 @@
 'use client'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Check, DatabaseIcon, Delete, EllipsisVertical, Loader2, MessageCircle, SendHorizontal, Trash, } from "lucide-react";
+import { Check, CheckCheck, CheckCheckIcon, DatabaseIcon, Delete, EllipsisVertical, Loader2, MessageCircle, SendHorizontal, Trash, } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogContent,
@@ -10,6 +10,27 @@ import {
     AlertDialogFooter,
     AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -23,7 +44,9 @@ import {
 import { Cross1Icon } from "@radix-ui/react-icons";
 import { Button } from "./button";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { checkInviteExistence, inviteForEntryTest } from "../adminDeshboard/admission/entryTest/invitef";
+// import inviteForEntryTest from "../adminDeshboard/admission/entryTest/invitef";
 
 const Verified = ({ className, ...props }) => (
     <svg
@@ -44,115 +67,219 @@ const truncate = (str, length) => {
 };
 
 
-const TweetHeader = ({ status, user, deleteUser }) => (
-    <div className="flex flex-row justify-between tracking-tight">
-        <div className="flex items-center space-x-2">
-            <Avatar>
-                <AvatarImage src={user.image} />
-                <AvatarFallback>{user.fname.slice(0, 1)}</AvatarFallback>
-            </Avatar>
-            <div>
-                <p className="flex items-center whitespace-nowrap font-semibold">
-                    {truncate(user.fname + " " + user.lname, 20)}
-                    {status.personalData ? <Verified className="ml-1 inline size-4 text-green-500" /> : null}
-                    {status.guardiansData ? <Verified className="ml-1 inline size-4 text-green-500" /> : null}
-                    {status.degreeProgramInformation ? <Verified className="ml-1 inline size-4 text-green-500" /> : null}
-                    {status.academicData ? <Verified className="ml-1 inline size-4 text-green-500" /> : null}
-                    {status.finalStepUploadDocuments ? <Verified className="ml-1 inline size-4 text-green-500" /> : null}
-                </p>
-                <div className="flex items-center space-x-1">
-                    <p
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-sm text-gray-500 transition-all duration-75"
-                    >
-                        @{truncate(user.email, 16)}
+// const TweetHeader = ({ status, user, deleteUser, entryTest }) => (
+const TweetHeader = ({ status, user, deleteUser, entryTest }) => {
+    const [selectedTest, setSelectedTest] = useState("");
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [message, setMessage] = useState("");
+    const [messageHead, setMessageHead] = useState("");
+    const [invitedCheck, setInvitedCheck] = useState(false);
+
+    useEffect(() => {
+        const checkInvite = async () => {
+            const check = await checkInviteExistence(user.cnic); // Assuming data.cnic is available
+            setInvitedCheck(check);
+        };
+
+        checkInvite();
+    }, [user.cnic]); // Add data.cnic to the dependency array to trigger when it changes
+
+    const inviteForTest = async () => {
+        const data = {
+            quizNo: selectedTest,
+            cnic: user.cnic
+        }
+        const check = await checkInviteExistence(data.cnic);
+        if (!check) {
+            const result = await inviteForEntryTest(data)
+            if (result) {
+                setMessageHead("Invite Submit");
+                setMessage(`${data.cnic} Invite for Test No: ${data.quizNo}`);
+                setIsDialogOpen(true);
+            } else {
+                setMessageHead("Error");
+                setMessage("An unexpected error occurred. Please contact support.");
+                setIsDialogOpen(true);
+            }
+        } else {
+            setMessageHead("Alert");
+            setMessage(`This user already invited for ${check.quizNo}. Cnic: ${check.cnic}`)
+            setIsDialogOpen(true);
+        }
+
+    }
+    return (
+        <div className="flex flex-row justify-between tracking-tight">
+            <div className="flex items-center space-x-2">
+                <Avatar>
+                    <AvatarImage src={user.image} />
+                    <AvatarFallback>{user.fname.slice(0, 1)}</AvatarFallback>
+                </Avatar>
+                <div>
+                    <p className="flex items-center whitespace-nowrap font-semibold">
+                        {truncate(user.fname + " " + user.lname, 20)}
+                        {status.personalData ? <Verified className="ml-1 inline size-4 text-green-500" /> : null}
+                        {status.guardiansData ? <Verified className="ml-1 inline size-4 text-green-500" /> : null}
+                        {status.degreeProgramInformation ? <Verified className="ml-1 inline size-4 text-green-500" /> : null}
+                        {status.academicData ? <Verified className="ml-1 inline size-4 text-green-500" /> : null}
+                        {status.finalStepUploadDocuments ? <Verified className="ml-1 inline size-4 text-green-500" /> : null}
                     </p>
+                    <div className="flex items-center space-x-1">
+                        <p
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-sm text-gray-500 transition-all duration-75"
+                        >
+                            @{truncate(user.email, 16)}
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <EllipsisVertical cursor="pointer" className="hover:scale-x-150" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-primary/90">
-                <DropdownMenuLabel>{user.fname}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        {
-                            status.personalData ? <Check /> : <Cross1Icon />
-                        }
-                        <span>Personal Data</span>
-                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        {
-                            status.guardiansData ? <Check /> : <Cross1Icon />
-                        }
-                        <span>Guardians Data</span>
-                        <DropdownMenuShortcut>⌘G</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        {
-                            status.degreeProgramInformation ? <Check /> : <Cross1Icon />
-                        }
-                        <span>Degree Program</span>
-                        <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        {
-                            status.academicData ? <Check /> : <Cross1Icon />
-                        }
-                        <span>Academic Data</span>
-                        <DropdownMenuShortcut>⌘A</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        {
-                            status.finalStepUploadDocuments ? <Check /> : <Cross1Icon />
-                        }
-                        <span>Documents</span>
-                        <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        <SendHorizontal />
-                        <span>Invite For Test</span>
-                    </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                    <Link href={`/dashboard/admission/admissionForms/${user.cnic}`}>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <EllipsisVertical cursor="pointer" className="hover:scale-x-150" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 bg-primary/90">
+                    <DropdownMenuLabel>{user.fname}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
                         <DropdownMenuItem>
-                            <DatabaseIcon />
-                            <span>All Information</span>
+                            {
+                                status.personalData ? <Check /> : <Cross1Icon />
+                            }
+                            <span>Personal Data</span>
+                            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                         </DropdownMenuItem>
-                    </Link>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                    <MessageCircle />
-                    <span>Message</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="p-0">
-                    <Button className="w-full p-1 text-red-500 font-bold"
-                        onClick={() => deleteUser(user.cnic)} // Pass cnic to deleteUser
-                    >
-                        <Trash />
-                        <span>Delete</span>
-                        <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                    </Button>
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+                        <DropdownMenuItem>
+                            {
+                                status.guardiansData ? <Check /> : <Cross1Icon />
+                            }
+                            <span>Guardians Data</span>
+                            <DropdownMenuShortcut>⌘G</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            {
+                                status.degreeProgramInformation ? <Check /> : <Cross1Icon />
+                            }
+                            <span>Degree Program</span>
+                            <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            {
+                                status.academicData ? <Check /> : <Cross1Icon />
+                            }
+                            <span>Academic Data</span>
+                            <DropdownMenuShortcut>⌘A</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            {
+                                status.finalStepUploadDocuments ? <Check /> : <Cross1Icon />
+                            }
+                            <span>Documents</span>
+                            <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button disabled={invitedCheck} variant="outline" className="w-full flex justify-start p-2 bg-black text-white">
+                                    {
+                                        invitedCheck ? <CheckCheckIcon/> : <SendHorizontal />
+                                    }
+                                    <span>Invite For Test</span>
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                    <DialogTitle>Edit Profile</DialogTitle>
+                                    <DialogDescription>
+                                        Make changes to your profile here. Click save when you are done.
+                                    </DialogDescription>
+                                </DialogHeader>
 
-    </div>
-);
+                                <div className="grid gap-4 py-4">
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="name" className="text-right">
+                                            Test Number
+                                        </Label>
+                                        <Select
+                                            onValueChange={(value) => setSelectedTest(value)} // Update state on selection
+                                        >
+                                            <SelectTrigger className="w-[180px]">
+                                                <SelectValue placeholder="Select a Test NO" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    {entryTest.map((item, index) => (
+                                                        <SelectItem key={index} value={item.quizNo}>
+                                                            {item.quizNo}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="cnic" className="text-right">
+                                            CNIC
+                                        </Label>
+                                        <Input
+                                            id="cnic"
+                                            disabled
+                                            value={user.cnic}
+                                            className="col-span-3"
+                                        />
+                                    </div>
+                                </div>
+                                <DialogFooter>
+                                    <Button type="submit" onClick={inviteForTest} className="text-black">Save changes</Button>
+                                </DialogFooter>
 
+                            </DialogContent>
+                        </Dialog>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                        <Link href={`/dashboard/admission/admissionForms/${user.cnic}`}>
+                            <DropdownMenuItem>
+                                <DatabaseIcon />
+                                <span>All Information</span>
+                            </DropdownMenuItem>
+                        </Link>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                        <MessageCircle />
+                        <span>Message</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="p-0">
+                        <Button className="w-full p-1 text-red-500 font-bold"
+                            onClick={() => deleteUser(user.cnic)} // Pass cnic to deleteUser
+                        >
+                            <Trash />
+                            <span>Delete</span>
+                            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                        </Button>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+            <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <AlertDialogContent className="rounded-md">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{messageHead}</AlertDialogTitle>
+                        <AlertDialogDescription>{message}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>Close</AlertDialogCancel>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </div>
+    );
+};
 const TweetBody = ({ user }) => (
     <div className="flex justify-between items-end">
         <div>
@@ -208,6 +335,23 @@ export const Tweet = (props) => {
     const [message, setMessage] = useState("");
     const [messageHead, setMessageHead] = useState("");
 
+    const [entryTest, setEntryTest] = useState([]);
+    useEffect(() => {
+        getEntryTest();
+    }, []);
+
+    const getEntryTest = async () => {
+        try {
+            const response = await fetch("/api/admission/entryTestQ/entryTest");
+            if (!response.ok) {
+                throw new Error("Failed to fetch Entry Test state");
+            }
+            const data = await response.json();
+            setEntryTest(data.result);
+        } catch (error) {
+            alert(error.message);
+        }
+    };
 
     const deleteUser = async (cnic) => {
         try {
@@ -394,9 +538,10 @@ export const Tweet = (props) => {
             alert("An error occurred while deleting the user.");
         }
     }
+
     return (
         <div className="flex hover:scale-y-105 duration-150 ease-in backdrop-blur-lg border border-white/40 shadow-lg bg-background/50 rounded-3xl size-full flex-col gap-2 border-black p-4">
-            <TweetHeader status={props.all} user={props.user} deleteUser={deleteUser} />
+            <TweetHeader status={props.all} user={props.user} deleteUser={deleteUser} entryTest={entryTest} />
             <TweetBody user={props.user} />
 
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

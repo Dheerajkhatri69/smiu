@@ -115,7 +115,7 @@ export function AppSidebar({
             },
             {
                 title: "Downloads Section",
-                url: "/dashboard/users",
+                url: "/admissiondashboard/download",
                 icon: Download,
             },
             {

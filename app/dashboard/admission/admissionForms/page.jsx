@@ -8,10 +8,22 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { DatabaseIcon, EllipsisVertical, MessageCircle, SendHorizontal, Trash } from "lucide-react";
+import { EllipsisVertical, MessageCircle, SendHorizontal, Trash } from "lucide-react";
 import deleteUser from "@/components/adminDeshboard/admission/deleteForm";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { checkInviteExistence, inviteForEntryTest } from "@/components/adminDeshboard/admission/entryTest/invitef";
 const Page = () => {
     const [existData, setExistData] = useState([]); // Original data
     const [filteredData, setFilteredData] = useState([]); // Filtered data to display
@@ -23,9 +35,25 @@ const Page = () => {
     const [message, setMessage] = useState("");
     const [messageHead, setMessageHead] = useState("");
 
+    const [entryTest, setEntryTest] = useState([]);
+    const [selectedTest, setSelectedTest] = useState("");
+
     useEffect(() => {
         getAdmissionState();
+        getEntryTest();
     }, []);
+    const getEntryTest = async () => {
+        try {
+            const response = await fetch("/api/admission/entryTestQ/entryTest");
+            if (!response.ok) {
+                throw new Error("Failed to fetch Entry Test state");
+            }
+            const data = await response.json();
+            setEntryTest(data.result);
+        } catch (error) {
+            alert(error.message);
+        }
+    };
 
     useEffect(() => {
         applyFilter();
@@ -95,11 +123,11 @@ const Page = () => {
             return null; // Explicitly return null to indicate failure
         }
     };
-    
+
     const deleteSelectedUser = async () => {
         const failedCNICs = [];
         const successfulCNICs = [];
-    
+
         for (const cnic of selectedCNICs) {
             try {
                 const state = await getAdmissionStateS(cnic);
@@ -108,10 +136,10 @@ const Page = () => {
                     failedCNICs.push(cnic);
                     continue; // Skip this CNIC and move to the next
                 }
-    
+
                 const deleteSteps = deleteUser(state, cnic);
                 let allStepsSuccessful = true;
-    
+
                 for (const step of deleteSteps) {
                     const isDeleted = await step(); // Execute each deletion step
                     if (!isDeleted) {
@@ -120,7 +148,7 @@ const Page = () => {
                         break; // Stop further steps if one fails
                     }
                 }
-    
+
                 if (allStepsSuccessful) {
                     successfulCNICs.push(cnic);
                 }
@@ -129,7 +157,7 @@ const Page = () => {
                 failedCNICs.push(cnic);
             }
         }
-    
+
         // Display consolidated message
         if (failedCNICs.length > 0 || successfulCNICs.length > 0) {
             setMessageHead("Deletion Summary");
@@ -144,7 +172,54 @@ const Page = () => {
             setIsDialogOpen(true);
         }
     };
-     
+
+    const inviteForTestSelectedUser = async () => {
+        const alreadyInvitedCNICs = [];
+        const newlyInvitedCNICs = [];
+        const failedCNICs = [];
+
+        for (const cnic of selectedCNICs) {
+            const data = { quizNo: selectedTest, cnic };
+
+            try {
+                const check = await checkInviteExistence(data.cnic); // Check if the CNIC is already invited
+
+                if (check) {
+                    // User already invited, add to the already invited list
+                    alreadyInvitedCNICs.push(`CNIC: ${check.cnic}, Test No: ${check.quizNo}`);
+                } else {
+                    // Attempt to invite the user
+                    const result = await inviteForEntryTest(data);
+                    if (result) {
+                        newlyInvitedCNICs.push(cnic); // Add to newly invited list
+                    } else {
+                        failedCNICs.push(cnic); // Track failures
+                    }
+                }
+            } catch (error) {
+                console.error(`Unexpected error for CNIC ${cnic}:`, error.message);
+                failedCNICs.push(cnic); // Track errors
+            }
+        }
+
+        // Display consolidated message
+        if (alreadyInvitedCNICs.length > 0 || newlyInvitedCNICs.length > 0 || failedCNICs.length > 0) {
+            setMessageHead("Invitation Summary");
+            setMessage(`
+                ${newlyInvitedCNICs.length > 0 ? `Successfully invited CNICs: ${newlyInvitedCNICs.join(", ")}.` : ""}
+                ${alreadyInvitedCNICs.length > 0 ? `Already invited CNICs: ${alreadyInvitedCNICs.join(", ")}.` : ""}
+                ${failedCNICs.length > 0 ? `Failed to process CNICs: ${failedCNICs.join(", ")}.` : ""}
+            `);
+            setIsDialogOpen(true);
+        } else {
+            setMessageHead("No Invitations Sent");
+            setMessage("No CNICs were successfully invited.");
+            setIsDialogOpen(true);
+        }
+    };
+
+
+
     return (
         <div className="flex flex-col gap-2">
             <div className="flex justify-between mx-2">
@@ -191,13 +266,69 @@ const Page = () => {
                                     <EllipsisVertical cursor="pointer" className="hover:scale-125 duration-100 ease-in" />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent className="w-56 bg-primary/90">
-                                    <DropdownMenuLabel>{selectedCNICs.length+" Form"}</DropdownMenuLabel>
+                                    <DropdownMenuLabel>{selectedCNICs.length + " Form"}</DropdownMenuLabel>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuGroup>
-                                        <DropdownMenuItem>
-                                            <SendHorizontal />
-                                            <span>Invite For Test</span>
-                                        </DropdownMenuItem>
+                                    <DropdownMenuGroup >
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button variant="outline" className="w-full flex justify-start p-2 bg-black text-white">
+                                                    <SendHorizontal />
+                                                    <span>Invite For Test</span>
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[425px]">
+                                                <DialogHeader>
+                                                    <DialogTitle>Edit Profile</DialogTitle>
+                                                    <DialogDescription>
+                                                        Make changes to your profile here. Click save when you are done.
+                                                    </DialogDescription>
+                                                </DialogHeader>
+
+                                                <div className="grid gap-4 py-4">
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label htmlFor="name" className="text-right">
+                                                            Test Number
+                                                        </Label>
+                                                        <Select
+                                                            onValueChange={(value) => setSelectedTest(value)} // Update state on selection
+                                                        >
+                                                            <SelectTrigger className="w-[180px]">
+                                                                <SelectValue placeholder="Select a Test NO" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectGroup>
+                                                                    {entryTest.map((item, index) => (
+                                                                        <SelectItem key={index} value={item.quizNo}>
+                                                                            {item.quizNo}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectGroup>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="flex ml-12 gap-4">
+                                                        <Label htmlFor="cnic" className="mt-2 text-right">
+                                                            CNIC
+                                                        </Label>
+                                                        <div className="flex flex-col gap-2">
+                                                            {selectedCNICs.map((cnic, idx) => (
+                                                                <Input
+                                                                    key={idx}
+                                                                    id={cnic}
+                                                                    disabled
+                                                                    value={cnic}
+                                                                    className="col-span-3"
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <DialogFooter>
+                                                    <Button type="submit" onClick={inviteForTestSelectedUser} className="text-black">Save changes</Button>
+                                                </DialogFooter>
+
+                                            </DialogContent>
+                                        </Dialog>
                                     </DropdownMenuGroup>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem>
@@ -206,7 +337,7 @@ const Page = () => {
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem className="p-0">
-                                        <Button className="w-full p-1 text-red-500 font-bold"
+                                        <Button className="w-full p-2 text-red-500 font-bold"
                                             onClick={() => deleteSelectedUser()} // Pass cnic to deleteUser
                                         >
                                             <Trash />

@@ -13,6 +13,7 @@ import {
   Send,
   Settings2,
   SquareTerminal,
+  University,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -54,18 +55,26 @@ export function AppSidebar({
     },
     navMain: [
       {
-        title: "Department",
-        url: "/dashboard/showDepartment",
-        icon: SquareTerminal,
+        title: "Admission",
+        url: "#",
         isActive: true,
+        icon: BookOpen,
         items: [
           {
-            title: "ALL Departments",
-            url: "/dashboard/showDepartment",
+            title: "Student Signup Email",
+            url: "/dashboard/studentsignupEmail",
           },
           {
-            title: "Add Department",
-            url: "/dashboard/addDepartment",
+            title: "Signin Form",
+            url: "/dashboard/studentsignupEmail/addstudentsignupEmail",
+          },
+          {
+            title: "Admission Forms",
+            url: "/dashboard/admission/admissionForms",
+          },
+          {
+            title: "Entry Test",
+            url: "/dashboard/admission/entryTest",
           },
         ],
       },
@@ -85,25 +94,21 @@ export function AppSidebar({
         ],
       },
       {
-        title: "Admission",
-        url: "#",
-        icon: BookOpen,
+        title: "Programs",
+        url: "/dashboard/programs",
+        icon: University,
         items: [
           {
-            title: "Student Signup Email",
-            url: "/dashboard/studentsignupEmail",
+            title: "Undergraduate Programs",
+            url: "#",
           },
           {
-            title: "Signin Form",
-            url: "/dashboard/studentsignupEmail/addstudentsignupEmail",
+            title: "Graduate Programs",
+            url: "#",
           },
           {
-            title: "Admission Forms",
-            url: "/dashboard/admission/admissionForms",
-          },
-          {
-            title: "Entry Test",
-            url: "/dashboard/admission/entryTest",
+            title: "Postgraduate Programs",
+            url: "#",
           },
         ],
       },
@@ -145,8 +150,8 @@ export function AppSidebar({
     ],
     projects: [
       {
-        name: "Design Engineering",
-        url: "#",
+        name: "Department",
+        url: "/dashboard/showDepartment",
         icon: Frame,
       },
       {
