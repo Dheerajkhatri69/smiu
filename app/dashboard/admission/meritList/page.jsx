@@ -193,7 +193,8 @@ export default function DataTableDemo() {
         const academic = academicData.result.find((item) => item.cnic === entry.cnic);
         const hscPercentage = academic?.hsc_alevel_percentage || 0;
         const sscPercentage = academic?.ssc_olevel_percentage || 0;
-        const MeritScore = (score * 0.5) + (hscPercentage * 0.3) + (sscPercentage * 0.1);
+        const normalizedScore = Math.min(score * (100 / 60), 100); // Ensure it doesn't exceed 100
+        const MeritScore = (normalizedScore * 0.5) + (hscPercentage * 0.3) + (sscPercentage * 0.1);
 
         return {
           ...entry,
