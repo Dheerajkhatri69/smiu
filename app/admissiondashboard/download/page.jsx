@@ -7,7 +7,6 @@ import {
     AlertDescription,
     AlertTitle,
 } from "@/components/ui/alert";
-import Link from 'next/link';
 import { checkInviteExistence } from '@/components/adminDeshboard/admission/entryTest/invitef';
 import { useSession } from 'next-auth/react';
 import { Skeleton } from '@/components/ui/skeleton';

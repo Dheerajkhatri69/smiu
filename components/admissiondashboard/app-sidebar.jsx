@@ -71,7 +71,7 @@ export function AppSidebar({
     }, [session]); // Use effect will run when session changes
     // console.log(user);
 
-    const useremail = user ? `${user.email || ""}`: "User";
+    const useremail = user ? `${user.email || ""}` : "User";
     const usercnic = user && user.cnic ? user.cnic.slice(-5) : "User CNIC";
 
 
@@ -79,39 +79,40 @@ export function AppSidebar({
         user: {
             name: useremail,
             email: usercnic, // Safeguard for ID
-            avatar:avatar,
+            avatar: avatar,
         },
         navMain: [
             {
                 title: "Admission Form",
                 url: "/admissiondashboard",
+                isActive: true,
                 icon: ClipboardType,
                 items: [
                     {
-                      title: "1. Personal Data",
-                      url: "/admissiondashboard/personaldata",
+                        title: "1. Personal Data",
+                        url: "/admissiondashboard/personaldata",
                     },
                     {
-                      title: "2. Guardian's Data",
-                      url: "/admissiondashboard/guardiansData",
+                        title: "2. Guardian's Data",
+                        url: "/admissiondashboard/guardiansData",
                     },
                     {
-                      title: "3. Degree Profram",
-                      url: "/admissiondashboard/degreeProgramInformation",
+                        title: "3. Degree Profram",
+                        url: "/admissiondashboard/degreeProgramInformation",
                     },
                     {
-                      title: "4. Academic Data",
-                      url: "/admissiondashboard/academicData",
+                        title: "4. Academic Data",
+                        url: "/admissiondashboard/academicData",
                     },
                     {
-                      title: "5. Print & Preview",
-                      url: "/admissiondashboard/printPreview",
+                        title: "5. Print & Preview",
+                        url: "/admissiondashboard/printPreview",
                     },
                     {
-                      title: "6. Final Step Upload Documents",
-                      url: "/admissiondashboard/finalStepUploadDocuments",
+                        title: "6. Final Step Upload Documents",
+                        url: "/admissiondashboard/finalStepUploadDocuments",
                     },
-                  ],
+                ],
             },
             {
                 title: "Downloads Section",

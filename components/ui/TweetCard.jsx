@@ -67,8 +67,7 @@ const truncate = (str, length) => {
 };
 
 
-// const TweetHeader = ({ status, user, deleteUser, entryTest }) => (
-const TweetHeader = ({ status, user, deleteUser, entryTest }) => {
+const TweetHeader = ({ status, user, deleteUser, entryTest, invitedStd }) => {
     const [selectedTest, setSelectedTest] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [message, setMessage] = useState("");
@@ -76,13 +75,11 @@ const TweetHeader = ({ status, user, deleteUser, entryTest }) => {
     const [invitedCheck, setInvitedCheck] = useState(false);
 
     useEffect(() => {
-        const checkInvite = async () => {
-            const check = await checkInviteExistence(user.cnic); // Assuming data.cnic is available
-            setInvitedCheck(check);
-        };
-
-        checkInvite();
-    }, [user.cnic]); // Add data.cnic to the dependency array to trigger when it changes
+        if (invitedStd && Array.isArray(invitedStd)) {
+            const exists = invitedStd.some((std) => std.cnic === user.cnic);
+            setInvitedCheck(exists);
+        }
+    }, [user.cnic, invitedStd]); // Trigger when user.cnic or invitedStd changes
 
     const inviteForTest = async () => {
         const data = {
@@ -184,9 +181,11 @@ const TweetHeader = ({ status, user, deleteUser, entryTest }) => {
                     <DropdownMenuGroup>
                         <Dialog>
                             <DialogTrigger asChild>
-                                <Button disabled={invitedCheck} variant="outline" className="w-full flex justify-start p-2 bg-black text-white">
+                                <Button
+                                    disabled={invitedCheck}
+                                    variant="outline" className="w-full flex justify-start p-2 bg-black text-white">
                                     {
-                                        invitedCheck ? <CheckCheckIcon/> : <SendHorizontal />
+                                        invitedCheck ? <CheckCheckIcon /> : <SendHorizontal />
                                     }
                                     <span>Invite For Test</span>
                                 </Button>
@@ -334,11 +333,26 @@ export const Tweet = (props) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [message, setMessage] = useState("");
     const [messageHead, setMessageHead] = useState("");
-
+    const [invitedStd, setInvitedStd] = useState([]);
     const [entryTest, setEntryTest] = useState([]);
     useEffect(() => {
         getEntryTest();
+        getInvitedStd();
     }, []);
+
+    const getInvitedStd = async () => {
+
+        try {
+            const response = await fetch("/api/admission/entryTestQ/inviteStd");
+            if (!response.ok) {
+                throw new Error("Failed to fetch Entry Test state");
+            }
+            const data = await response.json();
+            setInvitedStd(data.result);
+        } catch (error) {
+            alert(error.message);
+        }
+    }
 
     const getEntryTest = async () => {
         try {
@@ -541,7 +555,7 @@ export const Tweet = (props) => {
 
     return (
         <div className="flex hover:scale-y-105 duration-150 ease-in backdrop-blur-lg border border-white/40 shadow-lg bg-background/50 rounded-3xl size-full flex-col gap-2 border-black p-4">
-            <TweetHeader status={props.all} user={props.user} deleteUser={deleteUser} entryTest={entryTest} />
+            <TweetHeader status={props.all} user={props.user} deleteUser={deleteUser} entryTest={entryTest} invitedStd={invitedStd} />
             <TweetBody user={props.user} />
 
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

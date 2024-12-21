@@ -31,6 +31,9 @@ const Page = () => {
     const [selectUser, setSelectUser] = useState(false);
     const [selectedCNICs, setSelectedCNICs] = useState([]); // Store selected CNICs
 
+    const [filterProgram, setFilterProgram] = useState([]);
+    const [programs, setPrograms] = useState([]);
+
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [message, setMessage] = useState("");
     const [messageHead, setMessageHead] = useState("");
@@ -41,7 +44,23 @@ const Page = () => {
     useEffect(() => {
         getAdmissionState();
         getEntryTest();
+        getPrograms();
     }, []);
+
+    const getPrograms = async () => {
+        try {
+            const response = await fetch("/api/program");
+            if (!response.ok) {
+                throw new Error("Failed to fetch programs.");
+            }
+            const data = await response.json();
+            if (data.success) {
+                setPrograms(data.result); // Assuming the response contains a `result` array
+            }
+        } catch (error) {
+            alert(error.message);
+        }
+    };
     const getEntryTest = async () => {
         try {
             const response = await fetch("/api/admission/entryTestQ/entryTest");
@@ -218,8 +237,17 @@ const Page = () => {
         }
     };
 
+    const graduateFilterPrograms = (value) => {
 
+        const filterCategory = programs.filter(
+            (item) => item.category === value
+        );
+        setFilterProgram(filterCategory);
 
+    }
+    const FilterPrograms = (value) => {
+        console.log(value);
+    }
     return (
         <div className="flex flex-col gap-2">
             <div className="flex justify-between mx-2">
@@ -234,6 +262,40 @@ const Page = () => {
                 </ToggleGroup>
                 <Badge variant="outline" className={"bg-background/50 shadow-lg hover:bg-white rounded-full"}>{filteredData.length < 9 ? "0" + filteredData.length : filteredData.length}</Badge>
             </div>
+            {
+                filter === "ShowComlete" ?
+                    <div className="flex flex-col gap-2">
+                        <div className="flex justify-between mx-2">
+                            <ToggleGroup
+                                type="single"
+                                onValueChange={(value) => graduateFilterPrograms(value)}
+                                className="bg-background/50 rounded-sm"
+                            >
+                                <ToggleGroupItem value="Undergraduate">Undergraduate</ToggleGroupItem>
+                                <ToggleGroupItem value="Graduate">Graduate</ToggleGroupItem>
+                                <ToggleGroupItem value="Postgraduate">Postgraduate</ToggleGroupItem>
+                            </ToggleGroup>
+                        </div>
+                        <div className="mx-2">
+                            <ToggleGroup
+                                type="single"
+                                onValueChange={(value) => FilterPrograms(value)}
+                                className="rounded-sm flex flex-wrap justify-start"
+                            >
+                                {
+                                    filterProgram.map((e, index) => {
+                                        return (
+                                            <ToggleGroupItem key={index} className="bg-background/50 shadow-md" value={e.program}>
+                                                {e.sort}
+                                            </ToggleGroupItem>
+                                        );
+                                    })
+                                }
+                            </ToggleGroup>
+                        </div>
+                    </div> : null
+            }
+
             <div className="flex justify-between">
                 <Button className="text-black bg-primary-foreground m-2" onClick={() => { setSelectUser(!selectUser) }}>
                     Select

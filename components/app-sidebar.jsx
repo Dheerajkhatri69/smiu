@@ -76,6 +76,10 @@ export function AppSidebar({
             title: "Entry Test",
             url: "/dashboard/admission/entryTest",
           },
+          {
+            title: "Merit List",
+            url: "/dashboard/admission/meritList",
+          },
         ],
       },
       {
