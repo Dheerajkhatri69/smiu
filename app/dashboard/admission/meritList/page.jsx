@@ -153,17 +153,19 @@ export default function DataTableDemo() {
     fetchAndProcessData();
   }, []);
 
+
   const fetchAndProcessData = async () => {
     try {
       // Fetch all data in parallel
-      const [testResultRes, personalDataRes, programDataRes, academicDataRes] = await Promise.all([
+      const [testResultRes, personalDataRes, programDataRes, academicDataRes,programRes] = await Promise.all([
         fetch("/api/admission/entryTestQ/testScore"),
         fetch("/api/admission/personaldata"),
         fetch("/api/admission/degreeProgramInformation"),
         fetch("/api/admission/academicData"),
+        fetch("/api/program"),
       ]);
 
-      if (!testResultRes.ok || !personalDataRes.ok || !programDataRes.ok || !academicDataRes.ok) {
+      if (!testResultRes.ok || !personalDataRes.ok || !programDataRes.ok || !academicDataRes.ok || !programRes.ok) {
         throw new Error("Failed to fetch one or more APIs");
       }
 
@@ -172,16 +174,17 @@ export default function DataTableDemo() {
       const personalData = await personalDataRes.json();
       const programData = await programDataRes.json();
       const academicData = await academicDataRes.json();
-      // setData({ testResultData, personalData, programData, academicData })
-      // console.log(testResultData.result, personalData.result, programData.result, academicData.result );
 
+
+      const programResData = await programRes.json(); // use a new variable to store the parsed data
+      // console.log("Program: ", programResData.result);
       // Process data
       const updatedData = testResultData.result.map((entry) => {
         const testResult = testResultData.result.find((item) => item.cnic === entry.cnic);
         if (!testResult) return entry;
 
         const { score } = testResult;
-
+        
         const personal = personalData.result.find((item) => item.cnic === entry.cnic);
         const StdName = personal
           ? `${personal.fname || ""} ${personal.mname || ""} ${personal.lname || ""}`.trim()
@@ -189,6 +192,9 @@ export default function DataTableDemo() {
 
         const program = programData.result.find((item) => item.cnic === entry.cnic);
         const Program = program?.choice01 || entry.Program;
+
+        const programReo = programResData.result.find((item)=> item.program === program.choice01);
+        console.log("new: ",programReo.sort)
 
         const academic = academicData.result.find((item) => item.cnic === entry.cnic);
         const hscPercentage = academic?.hsc_alevel_percentage || 0;
@@ -211,8 +217,8 @@ export default function DataTableDemo() {
       console.error("Error:", error.message);
       alert(error.message);
     }
-  }; 
-  
+  };
+
   const [sorting, setSorting] = React.useState([
     { id: "MeritScore", desc: true }, // Default sorting by MeritScore (descending)
   ])
